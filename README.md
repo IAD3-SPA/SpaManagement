@@ -10,25 +10,38 @@ Website for spa manager and employees.
 - Karol Sliwa
 - Wojciech Zelasko
 
-## Other info
-This project was part of IT System course during 2023 summer semester of 3rd year Data Engineering and Analysis on AGH UST.
 
-## New Environment
+## Setup
+1. Create new environment
+```
 python -m venv venv
+```
 
-## Activate Environment
+2. Activate environment
+```
 venv\Script\activate
+```
 
-## Install library
+3. Install required libraries
+```
 pip install -r requirements.txt
+```
 
-## Django new project
+4. Start Django project
+```
 django-admin startproject SpaManagement
+```
 
-## Django start app
+5. Start Django app
+```
 cd SpaManagement
 python manage.py startapp SpaApp
+```
 
-## Run Server
+6. Run Server
+```
 python manage.py runserver
+```
 
+## Other info
+This project was part of IT System course during 2023 summer semester of 3rd year Data Engineering and Analysis on AGH UST.
