@@ -10,38 +10,15 @@ Website for spa manager and employees.
 - Karol Sliwa
 - Wojciech Zelasko
 
+## Prerequisites
+1. Install docker-compose and docker
 
 ## Setup
-1. Create new environment
-```
-python -m venv venv
-```
-
-2. Activate environment
-```
-venv\Script\activate
-```
-
-3. Install required libraries
-```
-pip install -r requirements.txt
-```
-
-4. Start Django project
-```
-django-admin startproject SpaManagement
-```
-
-5. Start Django app
-```
-cd SpaManagement
-python manage.py startapp SpaApp
-```
-
-6. Run Server
-```
-python manage.py runserver
-```
+1. chmod u+x script.bash
+2. Run ./script.bash
+3. Web app is hosted at 0.0.0.0:8000, PostgreSQL GUI is hosted at 0.0.0.0:8080.
+4. PgAdmin4 login is admin@example.com, password is password.
+5. Database hostname is db, name is myapp, admin login is django and admin password is django.
 
 ## Other info
 This project was part of IT System course during 2023 summer semester of 3rd year Data Engineering and Analysis on AGH UST.
