@@ -1,7 +1,10 @@
+{% extends "base.html" %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block content %}
 
-<h1>Programista 30k+</h1>
+    <div class="header">
+        <h1 class="hello">Witamy w SPA</h1>
+        <h2>Zapraszamy do zapoznania się z naszą ofertą! :)</h2>
+    </div>
 
-<h3>Zmienna var1 {{var1}}</h3>
-<h3>Zmienna var2 {{var2}}</h3>
+{% endblock content %}

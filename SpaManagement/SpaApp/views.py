@@ -1,10 +1,16 @@
 from django.shortcuts import HttpResponse, render
 
 # Create your views here.
+def htmlRender(request):
+    context = {
+        "var1": 10,
+        "var2": 15
+    }
 
+    return render(request, "index.html", context)
 def index(request):
     
-    return HttpResponse("Pierwsza strona pięknego SPA. Na podstronie help więcej informacji")
+    return render(request, "index.html")
 
 # widok do usunięcia
 def help(request):
@@ -23,11 +29,3 @@ def help(request):
     
     return HttpResponse(text)
 
-def htmlRender(request):
-    
-    context = {
-        "var1": 10,
-        "var2": 15
-    }
-    
-    return render(request, "index.html", context)
