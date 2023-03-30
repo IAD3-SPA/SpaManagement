@@ -3,3 +3,4 @@ Django==4.1.7
 sqlparse==0.4.3
 tzdata==2022.7
 psycopg2-binary==2.8.6
+django_bootstrap5==22.2

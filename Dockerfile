@@ -13,6 +13,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir psycopg2-binary
+RUN pip install --no-cache-dir django_bootstrap5
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY SpaManagement .
