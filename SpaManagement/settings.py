@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ygoo%)d%(p3j*(-of5%-=j89ka9sc#ma+s)f%a*t*af+p62s+a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_bootstrap5",
     'SpaApp',
-    'SpaManagement',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +86,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
 # posrgresql database    -  Bartek Karpiuk <3
 # DATABASES = {
 #     'default': {
