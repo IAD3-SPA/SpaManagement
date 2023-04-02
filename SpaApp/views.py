@@ -12,6 +12,34 @@ def index(request):
     
     return render(request, "index.html")
 
+def services(request):
+    
+    return render(request, "services.html")
+
+def products(request):
+    
+    return render(request, "products.html")
+
+def delivery_page(request):
+    
+    return render(request, "delivery_page.html")
+
+def receptionist_page(request):
+    
+    return render(request, "receptionist_page.html")
+
+def owner_page(request):
+    
+    return render(request, "owner_page.html")
+
+def accountant_page(request):
+    
+    return render(request, "accountant_page.html")
+
+def contact(request):
+    
+    return render(request, "strona_kotaktowa.html")
+
 # widok do usunięcia
 def help(request):
     
