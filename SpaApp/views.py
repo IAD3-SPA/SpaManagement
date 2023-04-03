@@ -1,13 +1,10 @@
-from django.shortcuts import HttpResponse, render
+from django.shortcuts import HttpResponse, render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
 
-# Create your views here.
-def htmlRender(request):
-    context = {
-        "var1": 10,
-        "var2": 15
-    }
+from .forms import NewEmployeeForm, LoginForm
 
-    return render(request, "index.html", context)
 def index(request):
     
     return render(request, "index.html")
@@ -57,3 +54,41 @@ def help(request):
     
     return HttpResponse(text)
 
+
+def register(request):
+
+    if request.method == "POST":
+        form = NewEmployeeForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Dodałeś pracownika")
+            return redirect("index")
+        messages.error(request, "Nie udało się dodać pracownika")
+    form = NewEmployeeForm()
+    context = {"form": form}
+    return render(request, "templates/register.html", context)
+
+
+def login_user(request):
+    
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("index")
+        messages.error(request, "Nie udało się zalogować")
+        return redirect("login_user")
+    
+    form = LoginForm()
+
+    context = {"form": form}
+    return render(request, "templates/login.html",context)
+            
+
+def logout_user(request):
+
+    logout(request)
+    return redirect("index")
