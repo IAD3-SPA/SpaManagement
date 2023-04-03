@@ -1,45 +1,44 @@
 from django.shortcuts import HttpResponse, render, redirect
-from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
 from .forms import NewEmployeeForm, LoginForm
 
+
 def index(request):
-    
     return render(request, "index.html")
 
+
 def services(request):
-    
     return render(request, "services.html")
 
+
 def products(request):
-    
     return render(request, "products.html")
 
+
 def delivery_page(request):
-    
     return render(request, "delivery_page.html")
 
+
 def receptionist_page(request):
-    
     return render(request, "receptionist_page.html")
 
+
 def owner_page(request):
-    
     return render(request, "owner_page.html")
 
+
 def accountant_page(request):
-    
     return render(request, "accountant_page.html")
 
+
 def contact(request):
-    
     return render(request, "strona_kotaktowa.html")
+
 
 # widok do usunięcia
 def help(request):
-    
     text = """
     Naszym głównym katalogiem jest katalog SpaApp: <br>
     - w pliku urls.py dodajemy kolejne strony w naszej aplikacji według schematu: path('<scieżka url>', views.<nazwa funkcji>, 
@@ -51,12 +50,11 @@ def help(request):
     - html dodajemy do katalogu templates, css do static/css, js do static/js, żeby style zadziałały na stronie trzeba je załadować tak jak w przykładzie
     i to chyba tyle
     """
-    
+
     return HttpResponse(text)
 
 
 def register(request):
-
     if request.method == "POST":
         form = NewEmployeeForm(request.POST)
         if form.is_valid():
@@ -71,7 +69,6 @@ def register(request):
 
 
 def login_user(request):
-    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -81,14 +78,13 @@ def login_user(request):
             return redirect("index")
         messages.error(request, "Nie udało się zalogować")
         return redirect("login_user")
-    
+
     form = LoginForm()
 
     context = {"form": form}
-    return render(request, "templates/login.html",context)
-            
+    return render(request, "templates/login.html", context)
+
 
 def logout_user(request):
-
     logout(request)
     return redirect("index")
