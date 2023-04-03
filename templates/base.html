@@ -38,13 +38,12 @@
             <a href="{% url 'logout_user' %}" class="btn btn-light">
                 Wyloguj się
             </a>
-
+                    <a href="{% url 'register' %}" class="btn btn-light">
+                Dodaj pracownika
+            </a>
         {% else %}
             <a href="{% url 'login_user' %}" class="btn btn-light">
                 Zaloguj się
-            </a>
-            <a href="{% url 'register' %}" class="btn btn-light">
-                Dodaj pracownika
             </a>
         {% endif %}
     </div>
