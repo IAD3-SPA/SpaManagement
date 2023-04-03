@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ygoo%)d%(p3j*(-of5%-=j89ka9sc#ma+s)f%a*t*af+p62s+a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '172.27.226.216']
 
 
 # Application definition
@@ -75,11 +75,15 @@ WSGI_APPLICATION = 'SpaManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# default sqlite3 database
+# postgresql database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myapp',
+        'USER': 'django',
+        'PASSWORD': 'django',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 # posrgresql database    -  Bartek Karpiuk <3
