@@ -9,6 +9,9 @@ class ProductDelivery(models.Model):
     date = models.DateField()
     # We could add Delivery Man ID or Name
 
+    def __str__(self):
+        return f"{self.name}_{self.delivery_id}: {self.date}"
+
 
 class Product(models.Model):
     """We have our own database of products we sell"""
@@ -18,11 +21,17 @@ class Product(models.Model):
     price = models.FloatField()
     expiry_time = models.TimeField()
 
+    def __str__(self):
+        return self.name
+
 
 class Storage(models.Model):
     """Storage Model stores current quantity"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     delivery = models.ForeignKey(ProductDelivery, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{str(self.product)}: {self.delivery.date}"
 
     class Meta:
         unique_together = ('product', 'delivery')
