@@ -12,6 +12,16 @@ class ProductDelivery(models.Model):
     def __str__(self):
         return f"{self.name}_{self.delivery_id}: {self.date}"
 
+    def save(self, *args, **kwargs):
+        try:
+            product = Product.objects.get(name=self.name)
+        except Product.DoesNotExist:
+            raise ValueError(f"{self.name} product does not exist")
+
+        super().save(*args, **kwargs)
+
+        Storage.objects.create(product=product, delivery=self)
+
 
 class Product(models.Model):
     """We have our own database of products we sell"""
