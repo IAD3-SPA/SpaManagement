@@ -41,10 +41,14 @@ class Storage(models.Model):
     """Storage Model stores current quantity"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     delivery = models.ForeignKey(ProductDelivery, on_delete=models.CASCADE)
-    expiry_date = delivery.date + timedelta(product.expiry_duration.total_seconds())
+    expiry_date = models.DateField()
 
     def __str__(self):
         return f"{str(self.product)}: {self.delivery.date}"
 
     class Meta:
         unique_together = ('product', 'delivery')
+
+    def save(self, *args, **kwargs):
+        self.expiry_date = self.delivery.date + self.product.expiry_duration
+        super().save(*args, **kwargs)
