@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.db import models
 
 
@@ -29,7 +31,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField()
     price = models.FloatField()
-    expiry_time = models.TimeField()
+    expiry_duration = models.DurationField()
 
     def __str__(self):
         return self.name
@@ -39,6 +41,7 @@ class Storage(models.Model):
     """Storage Model stores current quantity"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     delivery = models.ForeignKey(ProductDelivery, on_delete=models.CASCADE)
+    expiry_date = delivery.date + timedelta(product.expiry_duration.total_seconds())
 
     def __str__(self):
         return f"{str(self.product)}: {self.delivery.date}"
