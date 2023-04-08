@@ -2,8 +2,9 @@ from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 
-from .forms import NewEmployeeForm, LoginForm
 
+from .forms import NewEmployeeForm, LoginForm
+from .forms import ProductDeliveryForm
 
 def index(request):
     return render(request, "index.html")
@@ -88,3 +89,16 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect("index")
+
+def add_delivery(request):
+    if request.method == 'POST':
+        form = ProductDeliveryForm(request.POST)
+        if form.is_valid():
+            delivery_product = form.save()
+            messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
+            return redirect("index")
+        messages.error(request, "Nie udało się dodać produktów")
+    else:
+        form = ProductDeliveryForm()
+        context = {"form": form}
+    return render(request, 'add_delivery.html', context)

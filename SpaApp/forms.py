@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm, UsernameField
 from django.contrib.auth import authenticate, get_user_model
+from .models import ProductDelivery
+
 
 class NewEmployeeForm(UserCreationForm):
     
@@ -47,5 +49,8 @@ class LoginForm(forms.Form, NewEmployeeForm):
         self.fields["password"].widget.attrs.update(self.forms_attrs("Password"))
 
 
+class ProductDeliveryForm(forms.ModelForm):
+    class Meta:
+        model = ProductDelivery
+        fields = ['name', 'amount']
 
- 
