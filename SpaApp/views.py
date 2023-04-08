@@ -17,11 +17,6 @@ def services(request):
 def products(request):
     return render(request, "products.html")
 
-
-def delivery_page(request):
-    return render(request, "delivery_page.html")
-
-
 def receptionist_page(request):
     return render(request, "receptionist_page.html")
 
@@ -90,7 +85,7 @@ def logout_user(request):
     logout(request)
     return redirect("index")
 
-def add_delivery(request):
+def delivery_page(request):
     if request.method == 'POST':
         form = ProductDeliveryForm(request.POST)
         if form.is_valid():
@@ -100,5 +95,6 @@ def add_delivery(request):
         messages.error(request, "Nie udało się dodać produktów")
     else:
         form = ProductDeliveryForm()
-        context = {"form": form}
-    return render(request, 'add_delivery.html', context)
+    context = {"form": form}
+    return render(request, 'delivery_page.html', context)
+

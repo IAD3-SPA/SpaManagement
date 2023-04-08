@@ -6,7 +6,7 @@ class ProductDelivery(models.Model):
     delivery_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     amount = models.IntegerField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     # We could add Delivery Man ID or Name
 
     def __str__(self):

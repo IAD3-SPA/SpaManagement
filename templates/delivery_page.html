@@ -3,8 +3,51 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-<h1 class="center">
+<style>
+    .delivery_form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+    }
+    .delivery_form button {
+        margin: 0 auto;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+    .delivery_form label {
+        font-weight: bold;
+        color: #555;
+    }
+    .delivery_form input {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+</style>
+
+
+<h1 class="d-flex justify-content-center font-weight-bold">
     Delivery Page
 </h1>
+
+<div class="d-flex justify-content-center">
+    <h1>Add Delivery</h1>
+</div>
+
+<div class="container">
+    <div class="row my-5">
+        <div class="col-md-12">
+            <form method="post" class="delivery_form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-center w-80">
+                    <button class="btn btn-primary btn-lg w-100 h-30" type="submit">Zapisz produkty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>  
 
 {% endblock content %}

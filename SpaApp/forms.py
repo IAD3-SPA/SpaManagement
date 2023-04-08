@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm, UsernameField
 from django.contrib.auth import authenticate, get_user_model
 from .models import ProductDelivery
+from django.forms import DateInput
 
 
 class NewEmployeeForm(UserCreationForm):
@@ -52,5 +53,10 @@ class LoginForm(forms.Form, NewEmployeeForm):
 class ProductDeliveryForm(forms.ModelForm):
     class Meta:
         model = ProductDelivery
-        fields = ['name', 'amount']
-
+        fields = ['name', 'amount', 'date']
+        widgets = {
+                'date': DateInput( attrs={
+                'type': 'date', 'placeholder': 'yyyy-mm-dd (DOB)',
+                'class': 'form-control'
+                })
+        }
