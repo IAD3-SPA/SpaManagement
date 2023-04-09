@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('code', models.CharField(max_length=50, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100)),
-                ('image', models.ImageField(blank=True, null=True, upload_to='')),
+                ('image', models.ImageField(blank=True, null=True, upload_to='images/')),
                 ('price', models.FloatField()),
                 ('expiry_duration', models.DurationField()),
             ],

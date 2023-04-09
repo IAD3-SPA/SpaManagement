@@ -24,6 +24,7 @@ def insert_values(apps, schema_editor):
                                delivery=delivery,
                                expiry_date=delivery.date + product_.expiry_duration)
 
+
 def delete_values(apps, schema_editor):
     product = apps.get_model('SpaApp', 'Product')
     product_delivery = apps.get_model('SpaApp', 'ProductDelivery')
