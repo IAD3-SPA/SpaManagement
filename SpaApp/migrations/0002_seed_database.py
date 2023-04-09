@@ -24,6 +24,15 @@ def insert_values(apps, schema_editor):
                                delivery=delivery,
                                expiry_date=delivery.date + product_.expiry_duration)
 
+def delete_values(apps, schema_editor):
+    product = apps.get_model('SpaApp', 'Product')
+    product_delivery = apps.get_model('SpaApp', 'ProductDelivery')
+    storage = apps.get_model('SpaApp', 'Storage')
+
+    product.objects.all().delete()
+    product_delivery.objects.all().delete()
+    storage.objects.all().delete()
+
 
 class Migration(migrations.Migration):
 
@@ -32,5 +41,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(insert_values)
+        migrations.RunPython(insert_values, reverse_code=delete_values)
     ]
