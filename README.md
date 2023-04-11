@@ -79,7 +79,25 @@ docker exec -it <your_id> bash
 ```
 
 ### Making migrations
-Inside the container specify app you would like to make migrations for
+#### Making default migrations
+To migrate default migrations just run this command:
+```bash
+python manage.py migrate
+```
+#### Reversing migrations
+It is possible to reverse migrations and remove contents from database. <br>
+To do so run:
+```bash
+python manage.py migrate <app_name> zero
+```
+For example:
+```bash
+python manage.py migrate SpaApp zero
+```
+
+#### Making a new migration
+After you modified a model in `models.py` you need to make a migration. <br>
+To do so, inside the container specify app you would like to make migrations for
 ```bash
 python manage.py makemigrations <app_name>
 ```
@@ -91,6 +109,16 @@ And then migrate
 ```bash
 python manage.py migrate
 ```
+#### Making a new empty migration
+It is also possible to create a new empty migration like so:
+```bash
+python manage.py makemigrations --empty <app_name> --name <migration_name> 
+```
+For example:
+```bash
+python manage.py makemigrations --empty SpaApp --name seed_database
+```
+
 
 ## Contributors
 
