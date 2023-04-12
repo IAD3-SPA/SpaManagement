@@ -25,6 +25,14 @@
         border-radius: 5px;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     }
+
+    .alert-error {
+        border: 1px solid red;
+        padding: 10px;
+        margin-bottom: 10px;
+        color: red;
+        background-color: #f2f2f2;
+    }
 </style>
 
 
@@ -32,12 +40,18 @@
     Delivery Page
 </h1>
 
+<div class="d-flex justify-content-center font-weight-bold text-success">
+    <a href="{% url 'product_list' %}">
+        <h3>Pokaż zawartość naszego magazynu</h3>
+    </a>
+</div>
+
 <div class="d-flex justify-content-center">
     <h1>Add Delivery</h1>
 </div>
 
 <div class="container">
-    <div class="row my-5">
+    <div class="row my-0">
         <div class="col-md-12">
             <form method="post" class="delivery_form">
                 {% csrf_token %}

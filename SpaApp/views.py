@@ -1,10 +1,13 @@
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
+from itertools import groupby
+from operator import attrgetter
 
 
 from .forms import NewEmployeeForm, LoginForm
 from .forms import ProductDeliveryForm
+from .models import ProductDelivery
 
 def index(request):
     return render(request, "index.html")
@@ -100,4 +103,24 @@ def delivery_page(request):
         form = ProductDeliveryForm()
     context = {"form": form}
     return render(request, 'delivery_page.html', context)
+
+
+def product_list(request):
+    products_list = ProductDelivery.objects.all().order_by('name')
+    grouped_products = {}
+    for product in products_list:
+        # grouped_products[key] = {
+        #     'products': list(group),
+        #     'total_amount': sum(item.amount for item in group)
+        # }
+        if product.name in grouped_products:
+            grouped_products[product.name]['total_amount'] += product.amount
+        else:
+            grouped_products[product.name] = {
+                'name': product.name,
+                'total_amount': product.amount
+            }
+    context = {'grouped_products': grouped_products.values()}
+    return render(request, 'product_list.html', context)
+
 
