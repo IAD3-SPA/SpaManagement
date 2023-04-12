@@ -151,3 +151,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+AUTH_USER_MODEL = 'SpaApp.User'
+
+
+# SMTP Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "MAIL"
+EMAIL_HOST_PASSWORD = "GMAIL GENERATED PASSWORD"
+
+PASSWORD_RESET_TIMEOUT = 14400 # ???

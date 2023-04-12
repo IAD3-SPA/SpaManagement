@@ -1,5 +1,8 @@
 from django.db import models
 
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.utils.translation import gettext_lazy
+
 
 class ProductDelivery(models.Model):
     """Delivery Man fills only those fields"""
@@ -50,3 +53,177 @@ class Storage(models.Model):
     def save(self, *args, **kwargs):
         self.expiry_date = self.delivery.date + self.product.expiry_duration
         super().save(*args, **kwargs)
+
+
+
+class User(AbstractUser):
+    """Custom User model"""
+
+    class Types(models.TextChoices):
+        OWNER = "OWNER", "owner"
+        RECEPTIONIST = "RECEPTIONIST", "receptionist"
+        ACCOUNTANT = "ACCOUNTANT", "accountant"
+        SUPPLIER = "SUPPLIER", "supplier" # deliverer?
+
+    type = models.CharField(
+        gettext_lazy("Type"),
+        max_length=50,
+        choices=Types.choices,
+        default=Types.OWNER # 
+    )
+
+
+class OwnerManager(models.Manager):
+
+    def create_user(self, username, first_name, last_name, password, email):
+        if not email:
+            raise ValueError("Email must be given!")
+
+        if not password:
+            raise ValueError("Password must be given!")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            is_active=True,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+    
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.OWNER)
+
+
+class ReceptionistManager(models.Manager):
+
+    def create_user(self, username, first_name, last_name, password, email):
+        if not email:
+            raise ValueError("Email must be given!")
+
+        if not password:
+            raise ValueError("Password must be given!")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            is_active=False,       # to email activate
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+    
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.RECEPTIONIST)
+
+
+class AccountantManager(models.Manager):
+
+    def create_user(self, username, first_name, last_name, password, email):
+        if not email:
+            raise ValueError("Email must be given!")
+
+        if not password:
+            raise ValueError("Password must be given!")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            is_active=False,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+    
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.ACCOUNTANT)
+    
+
+class SupplierManager(models.Manager):
+
+    def create_user(self, username, first_name, last_name, password, email):
+        if not email:
+            raise ValueError("Email must be given!")
+
+        if not password:
+            raise ValueError("Password must be given!")
+
+        user = self.model(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            is_active=False,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+    
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.SUPPLIER)
+        
+        
+class Owner(User):
+
+    objects = OwnerManager()
+    base_type = User.Types.OWNER
+
+    class Meta:
+        proxy = True
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.OWNER
+        return super().save(*args, **kwargs)
+
+
+class Receptionist(User):
+
+    objects = ReceptionistManager()
+    base_type = User.Types.RECEPTIONIST
+
+    class Meta:
+        proxy = True
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.RECEPTIONIST
+        return super().save(*args, **kwargs)
+
+
+class Accountant(User):
+
+    objects = AccountantManager()
+    base_type = User.Types.ACCOUNTANT
+
+    class Meta:
+        proxy = True
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.ACCOUNTANT
+        return super().save(*args, **kwargs)
+
+
+class Supplier(User):
+
+    objects = SupplierManager()
+    base_type = User.Types.SUPPLIER
+
+    class Meta:
+        proxy = True
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.SUPPLIER
+        return super().save(*args, **kwargs)

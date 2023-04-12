@@ -1,9 +1,40 @@
 from django.shortcuts import HttpResponse, render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.conf import settings
 
 from .forms import NewEmployeeForm, LoginForm
+from .utils import create_new_user
+from .tokens import account_activation_token
 
+
+
+def send_registration_mail(request, user, email_to_send):
+    template_context = {
+        "user": user.first_name + " " + user.last_name,
+        "domain": get_current_site(request).domain,
+        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "token": account_activation_token.make_token(user),
+        "Protocol": "https" if request.is_secure() else "http"
+    }
+    template = render_to_string('activate.html', template_context)
+    mail_subject = "Aktywacja konta."
+    email = EmailMessage(
+        mail_subject,
+        template,
+        settings.EMAIL_HOST_USER,
+        [email_to_send]
+    )
+    email.send()
+
+
+User = get_user_model()
 
 def index(request):
     return render(request, "index.html")
@@ -54,15 +85,18 @@ def help(request):
     return HttpResponse(text)
 
 
+
 def register(request):
+
     if request.method == "POST":
         form = NewEmployeeForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "Dodałeś pracownika")
+            user = create_new_user(form)
+            user.save()
+            send_registration_mail(request, user, user.email)
+
             return redirect("index")
-        messages.error(request, "Nie udało się dodać pracownika")
+
     form = NewEmployeeForm()
     context = {"form": form}
     return render(request, "templates/register.html", context)
@@ -85,6 +119,25 @@ def login_user(request):
     return render(request, "templates/login.html", context)
 
 
+@login_required(login_url="login_user")
 def logout_user(request):
     logout(request)
+    return redirect("index")
+
+
+def activate(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except:
+        user = None
+    print(user)
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        # messages success
+        return redirect("login_user")
+    
+    # error
     return redirect("index")
