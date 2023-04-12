@@ -89,9 +89,12 @@ def delivery_page(request):
     if request.method == 'POST':
         form = ProductDeliveryForm(request.POST)
         if form.is_valid():
-            delivery_product = form.save()
-            messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
-            return redirect("index")
+            try:
+                delivery_product = form.save()
+                messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
+            except ValueError as e:
+                        messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
+            return redirect("delivery_page")
         messages.error(request, "Nie udało się dodać produktów")
     else:
         form = ProductDeliveryForm()
