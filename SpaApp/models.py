@@ -27,7 +27,7 @@ class Product(models.Model):
     """We have our own database of products we sell"""
     code = models.CharField(max_length=50, primary_key=True)
     name = models.CharField(max_length=100)
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, upload_to='images/')
     price = models.FloatField()
     expiry_duration = models.DurationField()
 
