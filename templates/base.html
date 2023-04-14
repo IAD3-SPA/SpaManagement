@@ -50,13 +50,14 @@
 
 </nav>
 
-
-<div class="container-fluid">
+<div class="container-fluid" style="min-height: 500px;
+margin-bottom: 100px;
+clear: both;">
     {% block content %}
 
     {% endblock content %}
 </div>
-<footer class="bg-light text-center text-lg-start fixed-bottom">
+<footer class="bg-light text-center text-lg-start">
     <div class="container p-4">
         <div class="row">
             <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
@@ -83,12 +84,14 @@
 
             <div class="col-lg-6 col-md-6 mb-4 mb-md-0">
                 <h5 class="text-uppercase mb-0">Social Media</h5>
-
-                <div class="icon-bar">
-                    <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                    <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="youtube"><i class="bi bi-youtube"></i></a>
+    
+                <div class="d-flex justify-content-center">
+                    <div style="padding: 20px">
+                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="youtube"><i class="bi bi-youtube"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
