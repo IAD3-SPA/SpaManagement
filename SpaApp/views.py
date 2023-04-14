@@ -34,11 +34,27 @@ def send_registration_mail(request, user, email_to_send):
     email.send()
 
 User = get_user_model()
+
+def is_owner(user):
+    return user.type == User.Types.OWNER
+
 def is_receptionist(user):
     return user.type == User.Types.RECEPTIONIST
 
+def is_accountant(user):
+    return user.type == User.Types.ACCOUNTANT
 
+def is_supplier(user):
+    return user.type == User.Types.SUPPLIER
 
+def is_owner_or_receptionist(user):
+    return is_owner(user) or is_receptionist(user)
+
+def is_owner_or_accountant(user):
+    return is_owner(user) or is_accountant(user)
+
+def is_owner_or_supplier(user):
+    return is_owner(user) or is_supplier(user)
 
 
 def index(request):
@@ -52,21 +68,24 @@ def services(request):
 def products(request):
     return render(request, "products.html")
 
-
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_supplier,login_url="index")
 def delivery_page(request):
     return render(request, "delivery_page.html")
 
 
 @login_required(login_url="login_user")
-@user_passes_test(is_receptionist,login_url="index")
+@user_passes_test(is_owner_or_receptionist,login_url="index")
 def receptionist_page(request):
     return render(request, "receptionist_page.html")
 
-
+@login_required(login_url="login_user")
+@user_passes_test(is_owner,login_url="index")
 def owner_page(request):
     return render(request, "owner_page.html")
 
-
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_accountant,login_url="index")
 def accountant_page(request):
     return render(request, "accountant_page.html")
 
@@ -116,6 +135,14 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            if is_owner(user):
+                return redirect("owner_page")
+            elif is_accountant(user):
+                return redirect("accountant_page")
+            elif is_receptionist(user):
+                return redirect("recepiotnist_page")
+            elif is_supplier(user):
+                return redirect("delivery_page")
             return redirect("index")
         messages.error(request, "Nie udało się zalogować")
         return redirect("login_user")
