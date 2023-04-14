@@ -1,7 +1,7 @@
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -33,8 +33,13 @@ def send_registration_mail(request, user, email_to_send):
     )
     email.send()
 
-
 User = get_user_model()
+def is_receptionist(user):
+    return user.type == User.Types.RECEPTIONIST
+
+
+
+
 
 def index(request):
     return render(request, "index.html")
@@ -52,6 +57,8 @@ def delivery_page(request):
     return render(request, "delivery_page.html")
 
 
+@login_required(login_url="login_user")
+@user_passes_test(is_receptionist,login_url="index")
 def receptionist_page(request):
     return render(request, "receptionist_page.html")
 
