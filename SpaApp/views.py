@@ -109,10 +109,6 @@ def product_list(request):
     products_list = ProductDelivery.objects.all().order_by('name')
     grouped_products = {}
     for product in products_list:
-        # grouped_products[key] = {
-        #     'products': list(group),
-        #     'total_amount': sum(item.amount for item in group)
-        # }
         if product.name in grouped_products:
             grouped_products[product.name]['total_amount'] += product.amount
         else:
