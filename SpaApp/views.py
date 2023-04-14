@@ -1,3 +1,6 @@
+from itertools import groupby
+from operator import attrgetter
+
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
@@ -35,8 +38,9 @@ def send_registration_mail(request, user, email_to_send):
 
 User = get_user_model()
 
-
-
+from .forms import NewEmployeeForm, LoginForm
+from .forms import ProductDeliveryForm
+from .models import ProductDelivery
 
 def index(request):
     return render(request, "index.html")
@@ -48,6 +52,7 @@ def services(request):
 
 def products(request):
     return render(request, "products.html")
+
 
 def schedule(request):
     return render(request, "schedule.html")
@@ -141,6 +146,38 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect("index")
+
+
+def delivery_page(request):
+    if request.method == 'POST':
+        form = ProductDeliveryForm(request.POST)
+        if form.is_valid():
+            try:
+                delivery_product = form.save()
+                messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
+            except ValueError as e:
+                        messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
+            return redirect("delivery_page")
+        messages.error(request, "Nie udało się dodać produktów")
+    else:
+        form = ProductDeliveryForm()
+    context = {"form": form}
+    return render(request, 'delivery_page.html', context)
+
+
+def product_list(request):
+    products_list = ProductDelivery.objects.all().order_by('name')
+    grouped_products = {}
+    for product in products_list:
+        if product.name in grouped_products:
+            grouped_products[product.name]['total_amount'] += product.amount
+        else:
+            grouped_products[product.name] = {
+                'name': product.name,
+                'total_amount': product.amount
+            }
+    context = {'grouped_products': grouped_products.values()}
+    return render(request, 'product_list.html', context)
 
 
 def activate(request, uidb64, token):

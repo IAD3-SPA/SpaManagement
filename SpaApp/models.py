@@ -52,6 +52,7 @@ class Storage(models.Model):
 
     def save(self, *args, **kwargs):
         self.expiry_date = self.delivery.date + self.product.expiry_duration
+
         super().save(*args, **kwargs)
 
 
@@ -227,3 +228,4 @@ class Supplier(User):
         if not self.pk:
             self.type = User.Types.SUPPLIER
         return super().save(*args, **kwargs)
+        
