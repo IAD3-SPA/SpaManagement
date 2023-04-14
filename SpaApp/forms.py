@@ -4,13 +4,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm, UsernameField
 from django.contrib.auth import authenticate, get_user_model
 
+User = get_user_model()
+
 class NewEmployeeForm(UserCreationForm):
     
     email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "username", "email", "password1", "password2")
+        fields = ("first_name", "last_name", "username", "email", "password1", "password2", "type")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,7 +22,8 @@ class NewEmployeeForm(UserCreationForm):
         self.fields["email"].widget.attrs.update(self.forms_attrs("Email"))
         self.fields["password1"].widget.attrs.update(self.forms_attrs("Hasło"))
         self.fields["password2"].widget.attrs.update(self.forms_attrs("Powtórz hasło"))
-
+        self.fields["type"].widget.attrs.update({"placeholder": "Type"})
+      
     def forms_attrs(self, placeholder):
         return {
             "class": "form-control my-3",

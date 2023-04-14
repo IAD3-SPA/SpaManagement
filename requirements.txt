@@ -5,3 +5,4 @@ tzdata==2022.7
 psycopg2-binary==2.8.6
 django_bootstrap5==22.2
 Pillow==9.5.0
+six
