@@ -35,7 +35,7 @@
         </ul>
 
         {% if request.user.is_authenticated %}
-            <a href="{% url 'logout_user' %}" class="btn btn-light">
+            <a href="{% url 'logout_user' %}" class="btn btn-light" style="margin-right: 10px">
                 Wyloguj się
             </a>
                     <a href="{% url 'register' %}" class="btn btn-light">
@@ -50,9 +50,7 @@
 
 </nav>
 
-<div class="container-fluid" style="min-height: 500px;
-margin-bottom: 100px;
-clear: both;">
+<div class="container-fluid" style="min-height: 500px;margin-bottom: 100px;clear: both;">
     {% block content %}
 
     {% endblock content %}

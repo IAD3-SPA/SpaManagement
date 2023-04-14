@@ -1,6 +1,5 @@
 from django.contrib import admin
-
-from .models import Product, ProductDelivery, Storage
+from .models import Product, ProductDelivery, Storage, User
 
 
 @admin.register(Product)
@@ -16,3 +15,9 @@ class ProductDeliveryAdmin(admin.ModelAdmin):
 @admin.register(Storage)
 class StorageAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('email', 'username', 'first_name', 'last_name', 'type', 'is_active')
+

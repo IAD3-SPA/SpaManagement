@@ -1,0 +1,10 @@
+
+
+{% autoescape off %}
+
+Cześć {{user}},
+kliknij poniższy link żeby aktywować swoje firmowe konto
+
+http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+
+{% endautoescape %}
