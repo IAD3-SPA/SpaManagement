@@ -35,7 +35,7 @@
         </ul>
 
         {% if request.user.is_authenticated %}
-            <a href="{% url 'logout_user' %}" class="btn btn-light">
+            <a href="{% url 'logout_user' %}" class="btn btn-light" style="margin-right: 10px">
                 Wyloguj się
             </a>
                     <a href="{% url 'register' %}" class="btn btn-light">
