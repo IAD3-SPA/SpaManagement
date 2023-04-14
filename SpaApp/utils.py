@@ -39,3 +39,23 @@ def create_new_user(form):
         )
 
 
+def is_owner(user):
+    return user.type == User.Types.OWNER
+
+def is_receptionist(user):
+    return user.type == User.Types.RECEPTIONIST
+
+def is_accountant(user):
+    return user.type == User.Types.ACCOUNTANT
+
+def is_supplier(user):
+    return user.type == User.Types.SUPPLIER
+
+def is_owner_or_receptionist(user):
+    return is_owner(user) or is_receptionist(user)
+
+def is_owner_or_accountant(user):
+    return is_owner(user) or is_accountant(user)
+
+def is_owner_or_supplier(user):
+    return is_owner(user) or is_supplier(user)
