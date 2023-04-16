@@ -1,3 +1,4 @@
+from typing import List, Tuple, Union
 from datetime import date, timedelta
 
 from django.shortcuts import HttpResponse, render, redirect
@@ -66,7 +67,8 @@ def owner_page(request):
     return render(request, "owner_page.html", {'message': message})
 
 
-def _create_warning_message():
+def _create_warning_message() -> Union[str, None]:
+    """Creates a full warning massage with bullet points of expired and soon to be expired products"""
     message = None
 
     products_week_left = _create_full_storage_message(7, 0)
@@ -86,7 +88,8 @@ def _create_warning_message():
     return message
 
 
-def _create_full_storage_message(days_top, days_bottom=None):
+def _create_full_storage_message(days_top, days_bottom=None) -> Union[str, None]:
+    """Creates message with bullet points of expired and soon to be expired products """
     storages = Storage
 
     expired_products = _get_expired_products(storages, days_top, days_bottom)
@@ -96,7 +99,8 @@ def _create_full_storage_message(days_top, days_bottom=None):
     return message
 
 
-def _get_expired_products(storages, days_top, days_bottom):
+def _get_expired_products(storages, days_top, days_bottom) -> List[Tuple[str, timedelta]]:
+    """Returns a list of tuples of expired products and days left"""
     expired_products = []
 
     for storage in storages.objects.all():
@@ -110,11 +114,14 @@ def _get_expired_products(storages, days_top, days_bottom):
     return expired_products
 
 
-def _create_expired_product_message(expired_products):
-    message = ''
+def _create_expired_product_message(expired_products) -> Union[str, None]:
+    """Creates a bullet points list of product names and days left"""
+    message = None
 
     if len(expired_products) <= 0:
         return message
+    else:
+        message = ''
 
     for name, days_left in expired_products:
         message += f"- {name}, {days_left} days\n"
@@ -122,7 +129,8 @@ def _create_expired_product_message(expired_products):
     return message
 
 
-def _check_expiry_date(product, delivery, days_top, days_bottom):
+def _check_expiry_date(product, delivery, days_top, days_bottom) -> Tuple[bool, timedelta]:
+    """Checks whether product expired and returns boolean value and time left"""
     expiry_date = delivery.date + product.expiry_duration
     time_left = expiry_date - date.today()
 
