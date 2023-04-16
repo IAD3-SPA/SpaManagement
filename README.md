@@ -118,8 +118,36 @@ For example:
 ```bash
 python manage.py makemigrations --empty SpaApp --name seed_database
 ```
-
-
+### Spa User lazy reference
+If you get the following error:
+```
+ValueError: The field admin.LogEntry.user was declared with a lazy reference to 'SpaApp.user', but app 'SpaApp' doesn't provide model 'user'.
+```
+Go to `settings.py` and in `INSTALLED_APPS` list comment the line with `'django.contrib.admin'`, so the list should look like:
+```python
+INSTALLED_APPS = [
+    # 'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    "django_bootstrap5",
+    'SpaApp',
+]
+```
+then go to the `urls.py` and comment the `admin/` path, this will look like:
+```python
+urlpatterns = [
+                  path('', include('SpaApp.urls')),
+                  # path('admin/', admin.site.urls),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # For product images
+```
+After both lines are commented make migrations:
+```bash
+python manage.py migrate 
+```
+And then uncomment those lines.
 ## Contributors
 
 - Anna Kaniowska
