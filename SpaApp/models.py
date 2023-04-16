@@ -1,6 +1,6 @@
 from django.db import models
-
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User as AuthUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy
 
 
@@ -57,9 +57,9 @@ class Storage(models.Model):
         super().save(*args, **kwargs)
 
 
-class _Manager(models.Manager):
+class _Manager(BaseUserManager):
     """Parent manager class"""
-    def create_user(self, username, first_name, last_name, password, email, is_active=False):
+    def create_user(self, username, first_name, last_name, password, email, is_active=False, **extra_fields):
         if not email:
             raise ValueError("Email must be given!")
 
@@ -72,6 +72,7 @@ class _Manager(models.Manager):
             last_name=last_name,
             email=email,
             is_active=is_active,  # to email activate
+            **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -79,10 +80,22 @@ class _Manager(models.Manager):
         return user
 
 
-class OwnerManager(_Manager):
+class UserManager(_Manager):
+    def create_superuser(self, username, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(username=username,
+                                first_name="",
+                                last_name="",
+                                password=password,
+                                email=email,
+                                is_active=True,
+                                **extra_fields)
 
-    def create_user(self, username, first_name, last_name, password, email, is_active=True):
-        return super().create_user(username, first_name, last_name, password, email, is_active)
+
+class OwnerManager(_Manager):
+    def create_user(self, username, first_name, last_name, password, email, is_active=True, **extra_fields):
+        return super().create_user(username, first_name, last_name, password, email, is_active, **extra_fields)
 
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Types.OWNER)
@@ -104,6 +117,8 @@ class SupplierManager(_Manager):
 
 
 class User(AbstractUser):
+    objects = UserManager()
+
     """Custom User model"""
     class Types(models.TextChoices):
         OWNER = "OWNER", "owner"
@@ -117,6 +132,11 @@ class User(AbstractUser):
         choices=Types.choices,
         default=Types.OWNER  #
     )
+
+    def get_auth_user(self):
+        if self.pk:
+            return AuthUser.objects.get(pk=self.pk)
+        return None
 
 
 class Owner(User):
