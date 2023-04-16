@@ -1,20 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm, UsernameField
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from .models import ProductDelivery
 from django.forms import DateInput
 
+user = get_user_model()
 
-User = get_user_model()
 
 class NewEmployeeForm(UserCreationForm):
-    
     email = forms.EmailField(required=True)
 
     class Meta:
-        model = User
+        model = user
         fields = ("first_name", "last_name", "username", "email", "password1", "password2", "type")
 
     def __init__(self, *args, **kwargs):
@@ -26,12 +23,13 @@ class NewEmployeeForm(UserCreationForm):
         self.fields["password1"].widget.attrs.update(self.forms_attrs("Hasło"))
         self.fields["password2"].widget.attrs.update(self.forms_attrs("Powtórz hasło"))
         self.fields["type"].widget.attrs.update({"placeholder": "Type"})
-      
-    def forms_attrs(self, placeholder):
+
+    @staticmethod
+    def forms_attrs(placeholder):
         return {
             "class": "form-control my-3",
             "placeholder": placeholder,
-            }
+        }
 
     def save(self, commit=True):
         user = super(NewEmployeeForm, self).save(commit=False)
@@ -42,10 +40,8 @@ class NewEmployeeForm(UserCreationForm):
 
 
 class LoginForm(forms.Form, NewEmployeeForm):
-
     username = forms.CharField(max_length=65)
     password = forms.CharField(max_length=65, widget=forms.PasswordInput)
-
 
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
@@ -58,8 +54,8 @@ class ProductDeliveryForm(forms.ModelForm):
         model = ProductDelivery
         fields = ['name', 'amount', 'date']
         widgets = {
-                'date': DateInput( attrs={
+            'date': DateInput(attrs={
                 'type': 'date', 'placeholder': 'yyyy-mm-dd (DOB)',
                 'class': 'form-control'
-                })
+            })
         }
