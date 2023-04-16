@@ -15,7 +15,8 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier
 from .tokens import account_activation_token
-from .models import Storage
+from .models import Storage, ProductDelivery
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -38,10 +39,6 @@ def send_registration_mail(request, user, email_to_send):
 
 
 User = get_user_model()
-
-from .forms import NewEmployeeForm, LoginForm
-from .forms import ProductDeliveryForm
-from .models import ProductDelivery
 
 
 def index(request):
