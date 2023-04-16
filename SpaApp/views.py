@@ -1,5 +1,4 @@
-from itertools import groupby
-from operator import attrgetter
+from datetime import date, timedelta
 
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate, get_user_model
@@ -12,10 +11,10 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 
-from .forms import NewEmployeeForm, LoginForm
-from .utils import create_new_user, is_accountant,is_owner,is_owner_or_accountant,is_owner_or_receptionist,is_owner_or_supplier,is_receptionist,is_supplier
+from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier
 from .tokens import account_activation_token
-
+from .models import Storage
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -36,11 +35,13 @@ def send_registration_mail(request, user, email_to_send):
     )
     email.send()
 
+
 User = get_user_model()
 
 from .forms import NewEmployeeForm, LoginForm
 from .forms import ProductDeliveryForm
 from .models import ProductDelivery
+
 
 def index(request):
     return render(request, "index.html")
@@ -59,22 +60,94 @@ def schedule(request):
 
 
 @login_required(login_url="login_user")
-@user_passes_test(is_owner,login_url="index")
+@user_passes_test(is_owner, login_url="index")
 def owner_page(request):
-    return render(request, "owner_page.html")
+    message = _create_warning_message()
+    return render(request, "owner_page.html", {'message': message})
+
+
+def _create_warning_message():
+    message = None
+
+    products_week_left = _create_full_storage_message(7, 0)
+    products_expired = _create_full_storage_message(0)
+
+    if any([products_expired, products_week_left]):
+        message = "Warning!\n"
+    else:
+        return message
+
+    if products_expired:
+        message += f"Following products have expired:\n{products_expired}"
+
+    if products_week_left:
+        message += f"Following products have less than a week:\n{products_week_left}"
+
+    return message
+
+
+def _create_full_storage_message(days_top, days_bottom=None):
+    storages = Storage
+
+    expired_products = _get_expired_products(storages, days_top, days_bottom)
+
+    message = _create_expired_product_message(expired_products)
+
+    return message
+
+
+def _get_expired_products(storages, days_top, days_bottom):
+    expired_products = []
+
+    for storage in storages.objects.all():
+        product = storage.product
+        delivery = storage.delivery
+        is_expired, time_left = _check_expiry_date(product, delivery, days_top, days_bottom)
+
+        if is_expired:
+            expired_products += [(product.name, time_left.days)]
+
+    return expired_products
+
+
+def _create_expired_product_message(expired_products):
+    message = ''
+
+    if len(expired_products) <= 0:
+        return message
+
+    for name, days_left in expired_products:
+        message += f"- {name}, {days_left} days\n"
+
+    return message
+
+
+def _check_expiry_date(product, delivery, days_top, days_bottom):
+    expiry_date = delivery.date + product.expiry_duration
+    time_left = expiry_date - date.today()
+
+    if days_bottom is not None:
+        is_expired = timedelta(days=days_top) >= time_left > timedelta(days=days_bottom)
+    else:
+        is_expired = timedelta(days=days_top) >= time_left
+
+    return is_expired, time_left
+
 
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_supplier,login_url="index")
+@user_passes_test(is_owner_or_supplier, login_url="index")
 def delivery_page(request):
     return render(request, "delivery_page.html")
 
+
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_receptionist,login_url="index")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
 def receptionist_page(request):
     return render(request, "receptionist_page.html")
 
+
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_accountant,login_url="index")
+@user_passes_test(is_owner_or_accountant, login_url="index")
 def accountant_page(request):
     return render(request, "accountant_page.html")
 
@@ -100,9 +173,7 @@ def help(request):
     return HttpResponse(text)
 
 
-
 def register(request):
-
     if request.method == "POST":
         form = NewEmployeeForm(request.POST)
         if form.is_valid():
@@ -154,9 +225,11 @@ def delivery_page(request):
         if form.is_valid():
             try:
                 delivery_product = form.save()
-                messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
+                messages.success(request,
+                                 "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name,
+                                                                                           delivery_product.amount))
             except ValueError as e:
-                        messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
+                messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
             return redirect("delivery_page")
         messages.error(request, "Nie udało się dodać produktów")
     else:
@@ -193,6 +266,6 @@ def activate(request, uidb64, token):
         user.save()
         # messages success
         return redirect("login_user")
-    
+
     # error
     return redirect("index")
