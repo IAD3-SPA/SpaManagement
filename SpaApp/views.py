@@ -1,6 +1,3 @@
-from typing import List, Tuple, Union
-from datetime import date, timedelta
-
 from django.shortcuts import HttpResponse, render, redirect
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
@@ -13,9 +10,9 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
-    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
 from .tokens import account_activation_token
-from .models import Storage, ProductDelivery
+from .models import ProductDelivery
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
@@ -60,83 +57,8 @@ def schedule(request):
 @login_required(login_url="login_user")
 @user_passes_test(is_owner, login_url="index")
 def owner_page(request):
-    message = _create_warning_message()
+    message = create_warning_message()
     return render(request, "owner_page.html", {'message': message})
-
-
-def _create_warning_message() -> Union[str, None]:
-    """Creates a full warning massage with bullet points of expired and soon to be expired products"""
-    message = None
-
-    products_week_left = _create_full_storage_message(7, 0)
-    products_expired = _create_full_storage_message(0)
-
-    if any([products_expired, products_week_left]):
-        message = "Warning!\n"
-    else:
-        return message
-
-    if products_expired:
-        message += f"Following products have expired:\n{products_expired}"
-
-    if products_week_left:
-        message += f"Following products have less than a week:\n{products_week_left}"
-
-    return message
-
-
-def _create_full_storage_message(days_top, days_bottom=None) -> Union[str, None]:
-    """Creates message with bullet points of expired and soon to be expired products """
-    storages = Storage
-
-    expired_products = _get_expired_products(storages, days_top, days_bottom)
-
-    message = _create_expired_product_message(expired_products)
-
-    return message
-
-
-def _get_expired_products(storages, days_top, days_bottom) -> List[Tuple[str, timedelta]]:
-    """Returns a list of tuples of expired products and days left"""
-    expired_products = []
-
-    for storage in storages.objects.all():
-        product = storage.product
-        delivery = storage.delivery
-        is_expired, time_left = _check_expiry_date(product, delivery, days_top, days_bottom)
-
-        if is_expired:
-            expired_products += [(product.name, time_left.days)]
-
-    return expired_products
-
-
-def _create_expired_product_message(expired_products) -> Union[str, None]:
-    """Creates a bullet points list of product names and days left"""
-    message = None
-
-    if len(expired_products) <= 0:
-        return message
-    else:
-        message = ''
-
-    for name, days_left in expired_products:
-        message += f"- {name}, {days_left} days\n"
-
-    return message
-
-
-def _check_expiry_date(product, delivery, days_top, days_bottom) -> Tuple[bool, timedelta]:
-    """Checks whether product expired and returns boolean value and time left"""
-    expiry_date = delivery.date + product.expiry_duration
-    time_left = expiry_date - date.today()
-
-    if days_bottom is not None:
-        is_expired = timedelta(days=days_top) >= time_left > timedelta(days=days_bottom)
-    else:
-        is_expired = timedelta(days=days_top) >= time_left
-
-    return is_expired, time_left
 
 
 @login_required(login_url="login_user")
