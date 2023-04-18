@@ -189,3 +189,28 @@ class Supplier(User):
         if not self.pk:
             self.type = User.Types.SUPPLIER
         return super().save(*args, **kwargs)
+
+
+class Client(models.Model): 
+    id = models.AutoField(primary_key=True) 
+    name = models.CharField(max_length=255) 
+    surname = models.CharField(max_length=255) 
+    phone_number = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.name + " " + self.surname
+
+
+class Appointment(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+
+
