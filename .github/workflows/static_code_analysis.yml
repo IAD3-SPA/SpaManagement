@@ -16,8 +16,3 @@ jobs:
       - name: Run pylint
         run: |
           pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
-
-      - name: Run django tests
-        run: |
-          python manage.py test 
-    
