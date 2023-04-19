@@ -34,6 +34,7 @@ class Product(models.Model):
     image = models.ImageField(blank=True, null=True, upload_to='images/')
     price = models.FloatField()
     expiry_duration = models.DurationField()
+ #   deficit_status = models.BooleanField()
 
     def __str__(self):
         return self.name

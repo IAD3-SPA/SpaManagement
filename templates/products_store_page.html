@@ -15,7 +15,7 @@
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
                 <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
                 <h3>Price: {{ product.price }} PLN</h3>
-                <form action="{% url 'delete_product'  product.name %}" method="POST">
+                <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
                     {% csrf_token %}
                     <input type="submit" value="Sold one product">
                 </form>

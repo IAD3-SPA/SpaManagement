@@ -193,16 +193,18 @@ def products_store_page(request):
                 'name': product.name,
                 'total_amount': product.amount,
                 'image': product_store.image,
-                'price': product_store.price
+                'price': product_store.price,
+                'delivery_id': product.delivery_id
 
             }
     context = {'grouped_products': grouped_products.values()}
     return render(request, 'products_store_page.html', context)
 
-def delete_product(request, product_name):
+def delete_product(request, product_name, delivery_id):
     # Get the product object
     #product = ProductDelivery.objects.get(name=product_name)
-    product_deliveries = ProductDelivery.objects.filter(name=product_name)
+    #product_deliveries = ProductDelivery.objects.filter(name=product_name)
+    product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
 
     # product_delivery = product_deliveries[0]
     # if product_delivery.name in request.POST:
@@ -210,11 +212,10 @@ def delete_product(request, product_name):
     # product_deliveries[1].save()
     # messages.success(request, f"Sold one {product_deliveries[1].name}")
     
-    for product_delivery in product_deliveries:
-        for product in product_delivery:
-            product_delivery.amount -= 1
-            product_delivery.save()
-            #messages.success(request, f"Sold one {product_delivery.product.name}")
+    # for product_delivery in product_deliveries:
+    product_delivery.amount -= 1
+    product_delivery.save()
+        #messages.success(request, f"Sold one {product_delivery.product.name}")
 
     #return render(request, 'product_delivery.html', {'product_deliveries': product_deliveries})
     return redirect('products_store_page')
