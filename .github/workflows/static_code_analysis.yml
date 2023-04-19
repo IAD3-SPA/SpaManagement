@@ -3,24 +3,25 @@ name: Static code analysis
 on: [ push ]
 
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-      name: Check out code
+  static_code_analysis:runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Check out code
 
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install docker-compose
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install docker-compose
 
-    - name: Run docker compose up
-      run: |
-        docker-compose up -d
+      - name: Run docker compose up
+        run: |
+          docker-compose up -d
 
-    - name: Run pylint in container
-      run: |
-        docker exec spamanagement-web-1 pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
+      - name: Run pylint in container
+        run: |
+          docker exec spamanagement-web-1 pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
 
-    - name: Run django tests
-      run: |
-        docker exec spamanagement-web-1 python manage.py test 
+      - name: Run django tests
+        run: |
+          docker exec spamanagement-web-1 python manage.py test 
+    
