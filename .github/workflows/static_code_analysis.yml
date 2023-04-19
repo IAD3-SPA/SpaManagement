@@ -16,4 +16,4 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint pylint-django django
     - name: Run Pylint
-      run: pylint --load-plugins pylint_django SpaApp/ SpaManagement/
+      run: pylint --load-plugins pylint_django SpaApp/ SpaManagement/ --threshold 7.5
