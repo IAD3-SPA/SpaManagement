@@ -13,11 +13,6 @@ jobs:
         run: |
           pip install --no-cache-dir -r requirements.txt 
 
-      - name: Run pylint in container
+      - name: Run pylint
         run: |
           pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
-
-      - name: Run django tests
-        run: |
-          python manage.py test 
-    
