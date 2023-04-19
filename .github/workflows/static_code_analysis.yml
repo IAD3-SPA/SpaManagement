@@ -3,7 +3,8 @@ name: Static code analysis
 on: [ push ]
 
 jobs:
-  static_code_analysis:runs-on: ubuntu-latest
+  static_code_analysis:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         name: Check out code
