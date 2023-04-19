@@ -1,0 +1,4 @@
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=SpaManagement.settings
+fail-under=5

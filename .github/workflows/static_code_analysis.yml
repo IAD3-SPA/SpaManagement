@@ -1,20 +1,26 @@
 name: Static code analysis
 
-on: [pull_request]
+on: [push]
 
 jobs:
-  pylint:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.x
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pylint pylint-django django
-    - name: Run Pylint
-      run: pylint --load-plugins pylint_django --django-settings-module=SpaManagement.settings --fail-under=7.5 SpaApp/ SpaManagement/
+  steps:
+    - uses: actions/checkout@v3
+      name: Check out code
 
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install docker-compose
+
+    - name: Run docker compose up
+      run: |
+        docker-compose up -d
+
+    - name: Run pylint in container
+      run: |
+        docker exec spamanagement-web-1 pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
+
+    - name: Run django tests
+      run: |
+        docker exec spamanagement-web-1 python manage.py test 
