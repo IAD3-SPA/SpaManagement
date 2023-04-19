@@ -1,11 +1,6 @@
 name: Build and push Docker image
 
-on:
-  pull_request:
-    types: [ closed ]
-  push:
-    branches:
-      - main
+on: ["push"]
 jobs:
   build-and-push:
 
