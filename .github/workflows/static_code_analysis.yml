@@ -9,20 +9,15 @@ jobs:
       - uses: actions/checkout@v3
         name: Check out code
 
-      - name: Install Docker Compose
+      - name: Install python packages
         run: |
-          sudo apt-get update
-          sudo apt-get -y install docker-compose
-
-      - name: Run docker compose up
-        run: |
-          docker-compose up -d
+          pip install --no-cache-dir -r requirements.txt 
 
       - name: Run pylint in container
         run: |
-          docker exec spamanagement-web-1 pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
+          pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
 
       - name: Run django tests
         run: |
-          docker exec spamanagement-web-1 python manage.py test 
+          python manage.py test 
     

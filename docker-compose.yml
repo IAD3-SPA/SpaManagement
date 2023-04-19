@@ -11,8 +11,8 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   web:
-    image: spa-app-dev:latest
-    build: 
+    image: spa_app:dev
+    build:
       context: .
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
