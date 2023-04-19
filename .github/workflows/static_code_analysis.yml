@@ -1,6 +1,6 @@
 name: Static code analysis
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   pylint:
@@ -16,5 +16,5 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint pylint-django django
     - name: Run Pylint
-      run: pylint --load-plugins pylint_django --django-settings-module=SpaManagement.settings --fail-under=5 SpaApp/ SpaManagement/
+      run: pylint --load-plugins pylint_django --django-settings-module=SpaManagement.settings --fail-under=7.5 SpaApp/ SpaManagement/
 
