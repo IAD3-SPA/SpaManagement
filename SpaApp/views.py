@@ -12,7 +12,7 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
 from .tokens import account_activation_token
-from .models import ProductDelivery
+from .models import ProductDelivery, Product
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
@@ -167,17 +167,57 @@ def delivery_page(request):
 
 def product_list(request):
     products_list = ProductDelivery.objects.all().order_by('name')
+    products_store = Product.objects.all().order_by('name')
     grouped_products = {}
-    for product in products_list:
+    for product, product_image in zip(products_list, products_store):
         if product.name in grouped_products:
             grouped_products[product.name]['total_amount'] += product.amount
         else:
             grouped_products[product.name] = {
                 'name': product.name,
-                'total_amount': product.amount
+                'total_amount': product.amount,
+                'image': product_image.image
             }
     context = {'grouped_products': grouped_products.values()}
     return render(request, 'product_list.html', context)
+
+def products_store_page(request):
+    products_list = ProductDelivery.objects.all().order_by('name')
+    products_store = Product.objects.all().order_by('name')
+    grouped_products = {}
+    for product, product_store in zip(products_list, products_store):
+        if product.name in grouped_products:
+            grouped_products[product.name]['total_amount'] += product.amount
+        else:
+            grouped_products[product.name] = {
+                'name': product.name,
+                'total_amount': product.amount,
+                'image': product_store.image,
+                'price': product_store.price
+
+            }
+    context = {'grouped_products': grouped_products.values()}
+    return render(request, 'products_store_page.html', context)
+
+def delete_product(request, product_name):
+    # Get the product object
+    #product = ProductDelivery.objects.get(name=product_name)
+    product_deliveries = ProductDelivery.objects.filter(name=product_name)
+
+    # product_delivery = product_deliveries[0]
+    # if product_delivery.name in request.POST:
+    # product_deliveries[1].amount -= 1
+    # product_deliveries[1].save()
+    # messages.success(request, f"Sold one {product_deliveries[1].name}")
+    
+    for product_delivery in product_deliveries:
+        for product in product_delivery:
+            product_delivery.amount -= 1
+            product_delivery.save()
+            #messages.success(request, f"Sold one {product_delivery.product.name}")
+
+    #return render(request, 'product_delivery.html', {'product_deliveries': product_deliveries})
+    return redirect('products_store_page')
 
 
 def activate(request, uidb64, token):

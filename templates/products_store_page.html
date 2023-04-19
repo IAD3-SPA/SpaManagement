@@ -4,7 +4,7 @@
 
 {% block content %}
   <div class="container">
-    <h1><strong>Products List</strong></h1>
+    <h1><strong>Products Store List</strong></h1>
     <div class="row">
       {% for product in grouped_products %}
         <div class="col-md-4">
@@ -14,9 +14,10 @@
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
                 <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
-                <form class="form-check-inline">
-                  <input class="form-check-input" type="checkbox" id="deficit-{{ product.id }}" {% if product.deficit %}checked{% endif %}>
-                  <label class="form-check-label" for="deficit-{{ product.id }}">Deficit</label>
+                <h3>Price: {{ product.price }} PLN</h3>
+                <form action="{% url 'delete_product'  product.name %}" method="POST">
+                    {% csrf_token %}
+                    <input type="submit" value="Sold one product">
                 </form>
             </div>
           </div>
@@ -25,4 +26,3 @@
     </div>
   </div>
 {% endblock %}
-
