@@ -159,4 +159,4 @@ And then uncomment those lines.
 
 
 ## Other info
-This project was part of IT System course during 2023 summer semester of 3rd year Data Engineering and Analysis on AGH UST.
+This project was part of IT System course during 2023 summer semester of 3rd year Data Engineering and Analysis on AGH UST
