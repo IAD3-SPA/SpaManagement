@@ -125,14 +125,14 @@ def login_user(request):
         if user is not None:
             login(request, user)
             if is_owner(user):
-                return redirect("owner_page")
+                return render(request, 'owner_page.html')
             elif is_accountant(user):
-                return redirect("accountant_page")
+                return render(request, 'accountant_page.html')
             elif is_receptionist(user):
-                return redirect("recepiotnist_page")
+                return render(request, 'recepiotnist_page.html')
             elif is_supplier(user):
-                return redirect("delivery_page")
-            return redirect("index")
+                return render(request, 'delivery_page.html')
+            return render(request, 'index.html')
         messages.error(request, "Nie udało się zalogować")
         return redirect("login_user")
 
