@@ -1,7 +1,4 @@
-from itertools import groupby
-from operator import attrgetter
-
-from django.shortcuts import HttpResponse, render, redirect
+from django.shortcuts import HttpResponse, render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -12,10 +9,11 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 
-from .forms import NewEmployeeForm, LoginForm
-from .utils import create_new_user, is_accountant,is_owner,is_owner_or_accountant,is_owner_or_receptionist,is_owner_or_supplier,is_receptionist,is_supplier
+from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
 from .tokens import account_activation_token
-
+from .models import ProductDelivery, Appointment
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -36,11 +34,9 @@ def send_registration_mail(request, user, email_to_send):
     )
     email.send()
 
+
 User = get_user_model()
 
-from .forms import NewEmployeeForm, LoginForm
-from .forms import ProductDeliveryForm
-from .models import ProductDelivery
 
 def index(request):
     return render(request, "index.html")
@@ -59,22 +55,26 @@ def schedule(request):
 
 
 @login_required(login_url="login_user")
-@user_passes_test(is_owner,login_url="index")
+@user_passes_test(is_owner, login_url="index")
 def owner_page(request):
-    return render(request, "owner_page.html")
+    message = create_warning_message()
+    return render(request, "owner_page.html", {'message': message})
+
 
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_supplier,login_url="index")
+@user_passes_test(is_owner_or_supplier, login_url="index")
 def delivery_page(request):
     return render(request, "delivery_page.html")
 
+
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_receptionist,login_url="index")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
 def receptionist_page(request):
     return render(request, "receptionist_page.html")
 
+
 @login_required(login_url="login_user")
-@user_passes_test(is_owner_or_accountant,login_url="index")
+@user_passes_test(is_owner_or_accountant, login_url="index")
 def accountant_page(request):
     return render(request, "accountant_page.html")
 
@@ -100,9 +100,7 @@ def help(request):
     return HttpResponse(text)
 
 
-
 def register(request):
-
     if request.method == "POST":
         form = NewEmployeeForm(request.POST)
         if form.is_valid():
@@ -154,9 +152,11 @@ def delivery_page(request):
         if form.is_valid():
             try:
                 delivery_product = form.save()
-                messages.success(request, "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name, delivery_product.amount))
+                messages.success(request,
+                                 "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name,
+                                                                                           delivery_product.amount))
             except ValueError as e:
-                        messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
+                messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
             return redirect("delivery_page")
         messages.error(request, "Nie udało się dodać produktów")
     else:
@@ -193,6 +193,15 @@ def activate(request, uidb64, token):
         user.save()
         # messages success
         return redirect("login_user")
-    
+
     # error
     return redirect("index")
+
+def schedule(request):
+    appointments = Appointment.objects.all()
+
+    return render(request, 'schedule.html', {'appointments': appointments})
+
+def appointment(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    return render(request, 'appointment.html', {'appointment': appointment})

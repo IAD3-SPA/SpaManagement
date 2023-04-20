@@ -1,0 +1,18 @@
+name: Static code analysis
+
+on: [ push ]
+
+jobs:
+  static_code_analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Check out code
+
+      - name: Install python packages
+        run: |
+          pip install --no-cache-dir -r requirements.txt 
+
+      - name: Run pylint
+        run: |
+          pylint --rcfile=.pylintrc SpaApp/ SpaManagement/
