@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ appointment.name }}</h1>
+
+  <dl>
+    <dt>Nazwa:</dt>
+    <dd>{{ appointment.name }}</dd>
+    <dt>Opis:</dt>
+    <dd>{{ appointment.description }}</dd>
+    <dt>Data:</dt>
+    <dd>{{ appointment.date }}</dd>
+    <dt>Godzina:</dt>
+    <dd>{{ appointment.time }}</dd>
+    <dt>Klient:</dt>
+    <dd>{{ appointment.client }}</dd>
+  </dl>
+{% endblock %}

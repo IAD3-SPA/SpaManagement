@@ -1,10 +1,29 @@
-{% extends "base.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
+{% extends 'base.html' %}
+
 {% block content %}
+  <h1 class="mb-4">Harmonogram</h1>
 
-<h1 class="center">
-    Harmonogram
-</h1>
-
-{% endblock content %}
+  <div class="table-responsive" >
+    <table class="table table-striped" style="background-color: #FFB6C1;">
+      <thead>
+        <tr>
+          <th scope="col">Nazwa</th>
+          <th scope="col">Data</th>
+          <th scope="col">Godzina</th>
+          <th scope="col">Klient</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in appointments %}
+        <tr>
+          <td>{{ appointment.name }}</td>
+          <td>{{ appointment.date }}</td>
+          <td>{{ appointment.time }}</td>
+          <td>{{ appointment.client }}</td>
+          <td><a href="{% url 'appointment' appointment.id %}" style="color:black">Szczegóły</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

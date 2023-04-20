@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponse, render, redirect
+from django.shortcuts import HttpResponse, render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -12,7 +12,7 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
 from .tokens import account_activation_token
-from .models import ProductDelivery
+from .models import ProductDelivery, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
@@ -196,3 +196,12 @@ def activate(request, uidb64, token):
 
     # error
     return redirect("index")
+
+def schedule(request):
+    appointments = Appointment.objects.all()
+
+    return render(request, 'schedule.html', {'appointments': appointments})
+
+def appointment(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    return render(request, 'appointment.html', {'appointment': appointment})
