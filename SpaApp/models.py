@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy
+from django.db import IntegrityError
 
 
 class ProductDelivery(models.Model):
@@ -21,10 +22,14 @@ class ProductDelivery(models.Model):
             product = Product.objects.get(name=self.name)
         except Product.DoesNotExist:
             raise ValueError(f"{self.name} product does not exist")
-
+            
         super().save(*args, **kwargs)
 
-        Storage.objects.create(product=product, delivery=self)
+        try: 
+            Storage.objects.create(product=product, delivery=self)
+        except IntegrityError:
+            Storage.objects.get(product=product, delivery=self).delete()
+            Storage.objects.create(product=product, delivery=self)
 
 
 class Product(models.Model):

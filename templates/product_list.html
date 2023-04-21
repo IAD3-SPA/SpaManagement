@@ -9,8 +9,9 @@
       {% for product in grouped_products %}
         <div class="col-md-4">
           <div class="card mb-4 box-shadow">
-            <!-- <img class="card-img-top" src="{{ MEDIA_URL }}product_7rOImYO.jpg" alt="{{ product.image }}"> -->
-            <img class="card-img-top" src="https://img.freepik.com/premium-zdjecie/pies-animowany-obrazek-generatywna-sztuczna-inteligencja_786688-641.jpg?w=1380" alt="{{ product.name }}">
+            <img class="card-img-top" src="{{ product.image.url }}">
+            <!-- <img class="card-img-top" src="../media/{{ product.image }}"> -->
+            <!-- <img class="card-img-top" src="https://img.freepik.com/premium-zdjecie/pies-animowany-obrazek-generatywna-sztuczna-inteligencja_786688-641.jpg?w=1380" alt="{{ product.name }}"> -->
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
                 <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
@@ -25,4 +26,5 @@
     </div>
   </div>
 {% endblock %}
+
 
