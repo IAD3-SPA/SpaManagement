@@ -176,8 +176,19 @@ def product_list(request):
             grouped_products[product.name] = {
                 'name': product.name,
                 'total_amount': product.amount,
-                'image': products_store.get(name=product.name).image
+                'image': products_store.get(name=product.name).image,
+                'deficit': products_store.get(name=product.name).deficit_status
             }
+
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        product = Product.objects.get(code=product_name)
+        if product.deficit_status:
+            product.deficit_status = False
+        else:
+            product.deficit_status = True
+        product.save() 
+           
     context = {'grouped_products': grouped_products.values()}
     return render(request, 'product_list.html', context)
 
@@ -206,6 +217,17 @@ def delete_product(request, product_name, delivery_id):
     product_delivery.amount -= 1
     product_delivery.save()
     return redirect('products_store_page')
+
+
+def change_deficit_status(request, product_name):
+    product_delivery = Product.objects.get(name=product_name)
+    if(product_delivery.deficit_status == False):
+        product_delivery.deficit_status = True
+        product_delivery.save()
+    else:
+        product_delivery.deficit_status = False
+        product_delivery.save()
+    return redirect('product_list')
 
 
 def activate(request, uidb64, token):

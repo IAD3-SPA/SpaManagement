@@ -44,13 +44,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
-class Deficit(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
-    is_deficit = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.product.name} Deficit: {self.is_deficit}"
-
 
 class Storage(models.Model):
     """Storage Model stores current quantity"""
