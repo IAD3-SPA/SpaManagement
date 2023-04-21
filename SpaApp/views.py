@@ -1,5 +1,4 @@
-import os
-from django.shortcuts import HttpResponse, render, redirect
+from django.shortcuts import HttpResponse, render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -124,14 +123,14 @@ def login_user(request):
         if user is not None:
             login(request, user)
             if is_owner(user):
-                return redirect("owner_page")
+                return render(request, 'owner_page.html')
             elif is_accountant(user):
-                return redirect("accountant_page")
+                return render(request, 'accountant_page.html')
             elif is_receptionist(user):
-                return redirect("recepiotnist_page")
+                return render(request, 'recepiotnist_page.html')
             elif is_supplier(user):
-                return redirect("delivery_page")
-            return redirect("index")
+                return render(request, 'delivery_page.html')
+            return render(request, 'index.html')
         messages.error(request, "Nie udało się zalogować")
         return redirect("login_user")
 
@@ -225,3 +224,12 @@ def activate(request, uidb64, token):
 
     # error
     return redirect("index")
+
+def schedule(request):
+    appointments = Appointment.objects.all()
+
+    return render(request, 'schedule.html', {'appointments': appointments})
+
+def appointment(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
+    return render(request, 'appointment.html', {'appointment': appointment})
