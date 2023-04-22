@@ -1,9 +1,11 @@
 from typing import List, Tuple, Union
 from datetime import timedelta, date
-
+from django import forms
 from django.contrib.auth import get_user_model
 
 from .models import Supplier, Accountant, Receptionist, Storage
+
+from datetime import datetime, timedelta, time, timezone
 
 User = get_user_model()
 
@@ -137,3 +139,22 @@ def _check_expiry_date(product, delivery, days_top, days_bottom) -> Tuple[bool, 
         is_expired = timedelta(days=days_top) >= time_left
 
     return is_expired, time_left
+
+
+class FormsAttr:
+    """Class for forms widgets"""
+    @staticmethod
+    def forms_attrs(placeholder: Union[str, None] = None) -> dict[str: str]: 
+        return {
+            "class": "form-control my-3",
+            "placeholder": placeholder,
+        }
+
+
+def get_next_hour() -> time:
+    """Check current hour and return """
+    ti = datetime.now(timezone(timedelta(hours=1))) + timedelta(minutes=30)
+    ti = ti.hour + 1 if ti.hour == datetime.now().hour else ti.hour + 2
+    return time(ti, 0).strftime("%H:%M")
+
+

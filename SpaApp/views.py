@@ -13,7 +13,7 @@ from .utils import create_new_user, is_accountant, is_owner, is_owner_or_account
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
 from .tokens import account_activation_token
 from .models import ProductDelivery, Appointment
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, AppointmentClientForm
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -205,3 +205,22 @@ def schedule(request):
 def appointment(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     return render(request, 'appointment.html', {'appointment': appointment})
+
+def new_appointment(request):
+    
+    if request.method == "POST":
+        form = AppointmentClientForm(request.POST)
+        if form.is_valid():
+            client = form["client"].save()
+            appointment = form["appointment"].save(commit=False)
+            appointment.client = client
+            appointment.save()
+            messages.success(request, "Dodano nowe spotkanie")
+            if is_receptionist(request.user):
+                return redirect("receptionist_page") 
+            return redirect("owner_page")
+        messages.error(request, "Data spotania nie może być wcześniejsza niż pół godziny od teraz.")
+    form = AppointmentClientForm()
+    context = {"form": form}
+    return render(request, 'new_appointment.html', context)
+
