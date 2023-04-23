@@ -1,8 +1,46 @@
-import re
 from datetime import timedelta, date
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import User, Product, ProductDelivery, Storage
+
+
+class ProductModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.code = '123'
+        cls.name = 'Product'
+        cls.image = None
+        cls.price = 123
+        cls.expiry_duration = timedelta(days=123)
+
+        cls.test_product = Product.objects.create(
+            code=cls.code,
+            name=cls.name,
+            image=cls.image,
+            price=cls.price,
+            expiry_duration=cls.expiry_duration,
+        )
+
+    def tearDown(self):
+        self.product.delete()
+        self.test_product.delete()
+
+    def setUp(self):
+        self.product = Product.objects.get(code='123')
+
+    def test_product_field(self):
+        self.assertEqual(self.product.code, self.code)
+        self.assertEqual(self.product.name, self.name)
+        self.assertEqual(self.product.price, self.price)
+        self.assertEqual(self.product.expiry_duration, self.expiry_duration)
+        self.assertEqual(self.product.deficit_status, False)
+
+    def test_max_values(self):
+        code_max_length = self.product._meta.get_field('code').max_length
+        name_max_length = self.product._meta.get_field('name').max_length
+        self.assertEqual(code_max_length, 50)
+        self.assertEqual(name_max_length, 100)
+
 
 class HomePageTestCase(TestCase):
     def test_home_page_status_code(self):
@@ -31,7 +69,8 @@ class OwnerPageTestCase(TestCase):
     def setUp(self):
         self.username = 'testuser'
         self.password = 'testpass'
-        self.user = User.objects.create_user(username=self.username, password=self.password, first_name='test', last_name='test', email='kapit2000@gmail.com')
+        self.user = User.objects.create_user(username=self.username, password=self.password, first_name='test',
+                                             last_name='test', email='kapit2000@gmail.com')
 
     def test_owner_page_status_code(self):
         url = reverse('owner_page')
