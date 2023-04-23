@@ -3,6 +3,12 @@ from datetime import timedelta, date
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import User, Product, ProductDelivery, Storage
+from .forms import AppointmentClientForm
+
+from datetime import datetime,date, timedelta
+
+
+
 
 class HomePageTestCase(TestCase):
     def test_home_page_status_code(self):
@@ -125,3 +131,46 @@ class StorageAlertTestCase(TestCase):
         self.assertContains(response, 'Warning!')
         self.assertContains(response, 'Following products have expired:')
         self.assertContains(response, 'Product 3')
+
+
+class AppointmentClientFormTestCase(TestCase):
+
+    def test_form_submission_valid_data(self):
+        form_data = {
+            'client-name': 'test',
+            'client-surname': 'test',
+            'client-phone_number': '123456789',
+            'appointment-name': 'Test',
+            'appointment-description': 'Test',
+            'appointment-date': date.today(),
+            'appointment-time': '22:00',
+        }
+        form = AppointmentClientForm(form_data)
+        self.assertTrue(form.is_valid())
+    
+    def test_form_submission_invalid_date(self):
+        form_data = {
+            'client-name': 'test',
+            'client-surname': 'test',
+            'client-phone_number': '123456789',
+            'appointment-name': 'Test',
+            'appointment-description': 'Test',
+            'appointment-date': '1970-01-01',
+            'appointment-time': datetime.now().time(),
+        }
+        form = AppointmentClientForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        
+    
+    def test_form_submission_invalid_time(self):
+        form_data = {
+            'client-name': 'test',
+            'client-surname': 'test',
+            'client-phone_number': '123456789',
+            'appointment-name': 'Test',
+            'appointment-description': 'Test',
+            'appointment-date': date.today(),
+            'appointment-time': datetime.now().strftime("%H:%M"),
+        }
+        form = AppointmentClientForm(data=form_data)
+        self.assertFalse(form.is_valid())

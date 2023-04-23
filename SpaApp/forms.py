@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import DateInput
 from django.contrib import messages
-from bootstrap_datepicker_plus.widgets import DatePickerInput
 from betterforms.multiform import MultiModelForm
 
 from .models import ProductDelivery, Client, Appointment
@@ -81,7 +80,6 @@ class AppointmentForm(forms.ModelForm):
         date = self.cleaned_data.get('date')
         time = self.cleaned_data.get('time')
         if date and time:
-            print(type(date))
             if date < date.today() or time < datetime.now().time():
                 raise forms.ValidationError("Podana data jest przeszła.")
         return cleaned_data
