@@ -5,11 +5,11 @@ from django.db import migrations
 def insert_values(apps, schema_editor):
     product = apps.get_model('SpaApp', 'Product')
     # P7D stands for Period 7 Days
-    product.objects.create(code='OIL000', name='Massage Oil', image=None, price=10., expiry_duration="P7D")
-    product.objects.create(code='OIL001', name='Lavender Oil', image=None, price=15.5, expiry_duration="P7D")
-    product.objects.create(code='SALT000', name='Bath Salts', image=None, price=5., expiry_duration="P14D")
-    product.objects.create(code='MASK000', name='Clay Mask', image=None, price=10.5, expiry_duration="P14D")
-    product.objects.create(code='MASK001', name='Green Tea Mask', image=None, price=20., expiry_duration="P14D")
+    product.objects.create(code='OIL000', name='Massage Oil', image=None, price=10., expiry_duration="P7D", deficit_status = False)
+    product.objects.create(code='OIL001', name='Lavender Oil', image=None, price=15.5, expiry_duration="P7D", deficit_status = True)
+    product.objects.create(code='SALT000', name='Bath Salts', image=None, price=5., expiry_duration="P14D", deficit_status = False)
+    product.objects.create(code='MASK000', name='Clay Mask', image=None, price=10.5, expiry_duration="P14D", deficit_status = True)
+    product.objects.create(code='MASK001', name='Green Tea Mask', image=None, price=20., expiry_duration="P14D", deficit_status = False)
 
     product_delivery = apps.get_model('SpaApp', 'ProductDelivery')
     product_delivery.objects.create(name='Massage Oil', amount=20, date='2023-04-09')
