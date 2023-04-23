@@ -9,14 +9,11 @@ class ProductModelTestCase(TestCase):
     def setUpTestData(cls):
         cls.code = '123'
         cls.name = 'Product'
-        cls.image = None
         cls.price = 123
         cls.expiry_duration = timedelta(days=123)
-
         cls.test_product = Product.objects.create(
             code=cls.code,
             name=cls.name,
-            image=cls.image,
             price=cls.price,
             expiry_duration=cls.expiry_duration,
         )
@@ -45,21 +42,15 @@ class ProductModelTestCase(TestCase):
 class ProductDeliveryModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.code = '123'
+        cls.test_product = Product.objects.create(
+            code='123',
+            name='Product',
+            price=123,
+            expiry_duration=timedelta(days=123),
+        )
         cls.name = 'Product'
         cls.amount = 123
         cls.date = date.today()
-        cls.image = None
-        cls.price = 123
-        cls.expiry_duration = timedelta(days=123)
-
-        cls.test_product = Product.objects.create(
-            code=cls.code,
-            name=cls.name,
-            image=cls.image,
-            price=cls.price,
-            expiry_duration=cls.expiry_duration,
-        )
 
         cls.test_delivery = ProductDelivery.objects.create(
             name=cls.name,
@@ -68,8 +59,8 @@ class ProductDeliveryModelTestCase(TestCase):
         )
 
     def tearDown(self) -> None:
-       self.test_product.delete()
-       self.test_delivery.delete()
+        self.test_product.delete()
+        self.test_delivery.delete()
 
     def setUp(self) -> None:
         self.delivery = ProductDelivery.objects.get(name=self.name)
@@ -82,6 +73,34 @@ class ProductDeliveryModelTestCase(TestCase):
     def test_max_values(self):
         name_max_length = self.delivery._meta.get_field('name').max_length
         self.assertEqual(name_max_length, 100)
+
+
+class StorageModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_product = Product.objects.create(
+            code='123',
+            name='Product',
+            price=123,
+            expiry_duration=timedelta(days=123),
+        )
+
+        cls.test_delivery = ProductDelivery.objects.create(
+            name='Product',
+            amount=123,
+            date=date.today(),
+        )
+
+    def tearDown(self) -> None:
+        self.test_product.delete()
+        self.test_delivery.delete()
+
+    def setUp(self) -> None:
+        self.storage = Storage.objects.get(product=self.test_product.code)
+
+    def test_storage_fields(self):
+        self.assertEqual(self.storage.product, self.test_product)
+        self.assertEqual(self.storage.delivery, self.test_delivery)
 
 
 class HomePageTestCase(TestCase):
