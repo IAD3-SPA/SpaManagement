@@ -217,5 +217,12 @@ class Appointment(models.Model):
         return self.name
 
 
+class Purchase(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.client} purchased {self.product.name} for {self.product.price}"
 
 

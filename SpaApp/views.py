@@ -224,3 +224,8 @@ def schedule(request):
 def appointment(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     return render(request, 'appointment.html', {'appointment': appointment})
+
+
+def client_page(request):
+    return render(request, 'client_page.html')
+

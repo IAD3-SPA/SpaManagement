@@ -23,4 +23,6 @@ urlpatterns = [
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
     path('appointment/<int:pk>/', views.appointment, name='appointment'),
+    path('client/', views.client_page, name='client'),
+
 ]
