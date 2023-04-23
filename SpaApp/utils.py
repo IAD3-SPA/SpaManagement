@@ -1,9 +1,9 @@
-from typing import List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 from datetime import timedelta, date
 
 from django.contrib.auth import get_user_model
 
-from .models import Supplier, Accountant, Receptionist, Storage
+from .models import Supplier, Accountant, Receptionist, Storage, Product, ProductDelivery
 
 User = get_user_model()
 
@@ -137,3 +137,29 @@ def _check_expiry_date(product, delivery, days_top, days_bottom) -> Tuple[bool, 
         is_expired = timedelta(days=days_top) >= time_left
 
     return is_expired, time_left
+
+
+def _order_product_by_name(defifit_booelan) -> Dict[str, any]:
+    products_list = ProductDelivery.objects.all().order_by('name')
+    products_store = Product.objects.all().order_by('name')
+    grouped_products = {}
+    for product in products_list:
+        if product.name in grouped_products:
+            grouped_products[product.name]['total_amount'] += product.amount
+        else:
+            if defifit_booelan:
+                grouped_products[product.name] = {
+                    'name': product.name,
+                    'total_amount': product.amount,
+                    'image': products_store.get(name=product.name).image,
+                    'deficit': products_store.get(name=product.name).deficit_status
+                }
+            else:
+                grouped_products[product.name] = {
+                    'name': product.name,
+                    'total_amount': product.amount,
+                    'image': products_store.get(name=product.name).image,
+                    'price': products_store.get(name=product.name).price,
+                    'delivery_id': product.delivery_id
+            }
+    return grouped_products
