@@ -155,6 +155,5 @@ def get_next_hour() -> time:
     """Check current hour and return """
     ti = datetime.now(timezone(timedelta(hours=1))) + timedelta(minutes=30)
     ti = ti.hour + 1 if ti.hour == datetime.now().hour else ti.hour + 2
+    if ti >= 24: ti = 0
     return time(ti, 0).strftime("%H:%M")
-
-

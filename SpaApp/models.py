@@ -191,9 +191,9 @@ class Supplier(User):
         return super().save(*args, **kwargs)
 
 
-class Client(models.Model): 
-    name = models.CharField(max_length=255) 
-    surname = models.CharField(max_length=255) 
+class Client(models.Model):
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15)
 
     def __str__(self):
@@ -209,7 +209,3 @@ class Appointment(models.Model):
 
     def __str__(self):
         return self.name
-
-
-
-

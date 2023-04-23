@@ -70,7 +70,8 @@ class AppointmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AppointmentForm, self).__init__(*args, **kwargs)
         self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Nazwa"))
-        self.fields["description"].widget.attrs.update(FormsAttr.forms_attrs("Informacje dodatkowe..."))
+        self.fields["description"].widget.attrs.update(
+            FormsAttr.forms_attrs("Informacje dodatkowe"))
         self.fields["date"].widget.attrs.update(FormsAttr.forms_attrs())
         self.fields["time"].widget.attrs.update(FormsAttr.forms_attrs())
         self.initial["time"] = get_next_hour()
@@ -90,7 +91,6 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ["name", "surname", "phone_number"]
-    
     def __init__(self, *args, **kwargs):
         super(ClientForm, self).__init__(*args, **kwargs)
         self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Imie"))
