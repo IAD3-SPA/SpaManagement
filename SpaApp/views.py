@@ -13,7 +13,7 @@ from .utils import create_new_user, is_accountant, is_owner, is_owner_or_account
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
 from .models import ProductDelivery, Product
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -113,6 +113,22 @@ def register(request):
     form = NewEmployeeForm()
     context = {"form": form}
     return render(request, "templates/register.html", context)
+
+
+def client_register(request):
+    if request.method == "POST":
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            client = form.save(commit=False)
+            client.set_password("dummy_password")
+            client.save()
+            user = authenticate(username=client.username, password="dummy_password")
+            login(request, user)
+            return redirect("client", pk=client.pk)
+    else:
+        form = ClientForm()
+    context = {"form": form}
+    return render(request, "register.html", context)
 
 
 def login_user(request):

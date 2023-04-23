@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from .models import ProductDelivery
 from django.forms import DateInput
+from .models import Client
 
 user = get_user_model()
 
@@ -59,3 +60,21 @@ class ProductDeliveryForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
+
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ['name', 'surname', 'phone_number']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Imie'}),
+            'surname': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Nazwisko'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Numer telefonu'}),
+        }
+
+    def save(self, commit=True):
+        client = super().save(commit=False)
+        if commit:
+            client.save()
+        return client
+
+
