@@ -8,10 +8,18 @@
     <div class="row">
       {% for product in grouped_products %}
         <div class="col-md-4">
-          <div class="card mb-4 box-shadow">
+          <div class="card mb-4 box-shadow {% if product.deficit %}bg-danger text-white{% endif %}">
+            <img class="card-img-top" src="{{ product.image.url }}">
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
-                <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
+                <h3 class="{% if product.deficit %}text-muted font-weight-bold{% endif %}">Amount: {{ product.total_amount }}</h3>
+                <form action="{% url 'change_deficit_status' product.name %}" method="POST">
+                  {% csrf_token %}
+                  {% if product.deficit %}
+                  <h3 class="font-weight-bold">Deficyt!</h3>
+                  {% endif %}
+                  <input type="submit" value="Change Deficit Status">
+                </form>
             </div>
           </div>
         </div>
@@ -19,4 +27,6 @@
     </div>
   </div>
 {% endblock %}
+
+
 

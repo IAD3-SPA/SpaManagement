@@ -2,7 +2,7 @@ import re
 from datetime import timedelta, date
 from django.test import TestCase, Client
 from django.urls import reverse
-from .models import User, Product, ProductDelivery, Storage
+from .models import User, Product, ProductDelivery, Storage, Appointment, Client
 
 class HomePageTestCase(TestCase):
     def test_home_page_status_code(self):
@@ -125,3 +125,33 @@ class StorageAlertTestCase(TestCase):
         self.assertContains(response, 'Warning!')
         self.assertContains(response, 'Following products have expired:')
         self.assertContains(response, 'Product 3')
+
+
+class ScheduleViewTestCase(TestCase):
+    def setUp(self):
+        self.client1 = Client.objects.create(name='John', surname='Doe', phone_number='123456789')
+        self.appointment1 = Appointment.objects.create(name='Meeting', date='2023-04-23', time='14:00', client=self.client1)
+        
+
+    def test_schedule_view(self):
+        url = reverse('schedule')
+        response = self.client.get(url)
+        self.assertContains(response, self.appointment1.client.name)
+        self.assertContains(response, '<td>April 23, 2023</td>')
+        self.assertContains(response, '<td>2 p.m.</td>')
+        
+
+class AppointmentTemplateTest(TestCase):
+    def setUp(self):
+        self.client1 = Client.objects.create(name='John', surname='Doe', phone_number='123456789')
+        self.appointment1 = Appointment.objects.create(name='Meeting', description='Discuss new project', date='2023-04-23', time='14:00', client=self.client1)
+
+    def test_appointment_template(self):
+        url = reverse('appointment', args=[self.appointment1.id])
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'appointment.html')
+        self.assertContains(response, self.appointment1.name)
+        self.assertContains(response, self.appointment1.description)
+        self.assertContains(response, '<dd>April 23, 2023</dd>')
+        self.assertContains(response, '<dd>2 p.m.</dd>')
+        self.assertContains(response, self.client1)

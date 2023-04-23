@@ -10,9 +10,9 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
-    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Appointment
+from .models import ProductDelivery, Product
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
@@ -165,19 +165,38 @@ def delivery_page(request):
     return render(request, 'delivery_page.html', context)
 
 
+
+
 def product_list(request):
-    products_list = ProductDelivery.objects.all().order_by('name')
-    grouped_products = {}
-    for product in products_list:
-        if product.name in grouped_products:
-            grouped_products[product.name]['total_amount'] += product.amount
-        else:
-            grouped_products[product.name] = {
-                'name': product.name,
-                'total_amount': product.amount
-            }
+    grouped_products = _order_product_by_name(True)
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        product = Product.objects.get(code=product_name)
+        product.deficit_status = not product.deficit_status 
+        product.save() 
+           
     context = {'grouped_products': grouped_products.values()}
     return render(request, 'product_list.html', context)
+
+
+def products_store_page(request):
+    grouped_products = _order_product_by_name(False)
+    context = {'grouped_products': grouped_products.values()}
+    return render(request, 'products_store_page.html', context)
+
+
+def delete_product(request, product_name, delivery_id):
+    product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
+    product_delivery.amount -= 1
+    product_delivery.save()
+    return redirect('products_store_page')
+
+
+def change_deficit_status(request, product_name):
+    product_delivery = Product.objects.get(name=product_name)
+    product_delivery.deficit_status = not product_delivery.deficit_status
+    product_delivery.save()
+    return redirect('product_list')
 
 
 def activate(request, uidb64, token):
