@@ -28,7 +28,7 @@ class ProductModelTestCase(TestCase):
     def setUp(self):
         self.product = Product.objects.get(code='123')
 
-    def test_product_field(self):
+    def test_product_fields(self):
         self.assertEqual(self.product.code, self.code)
         self.assertEqual(self.product.name, self.name)
         self.assertEqual(self.product.price, self.price)
@@ -39,6 +39,48 @@ class ProductModelTestCase(TestCase):
         code_max_length = self.product._meta.get_field('code').max_length
         name_max_length = self.product._meta.get_field('name').max_length
         self.assertEqual(code_max_length, 50)
+        self.assertEqual(name_max_length, 100)
+
+
+class ProductDeliveryModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.code = '123'
+        cls.name = 'Product'
+        cls.amount = 123
+        cls.date = date.today()
+        cls.image = None
+        cls.price = 123
+        cls.expiry_duration = timedelta(days=123)
+
+        cls.test_product = Product.objects.create(
+            code=cls.code,
+            name=cls.name,
+            image=cls.image,
+            price=cls.price,
+            expiry_duration=cls.expiry_duration,
+        )
+
+        cls.test_delivery = ProductDelivery.objects.create(
+            name=cls.name,
+            amount=cls.amount,
+            date=cls.date,
+        )
+
+    def tearDown(self) -> None:
+       self.test_product.delete()
+       self.test_delivery.delete()
+
+    def setUp(self) -> None:
+        self.delivery = ProductDelivery.objects.get(name=self.name)
+
+    def test_delivery_fields(self):
+        self.assertEqual(self.delivery.name, self.name)
+        self.assertEqual(self.delivery.amount, self.amount)
+        self.assertEqual(self.delivery.date, self.date)
+
+    def test_max_values(self):
+        name_max_length = self.delivery._meta.get_field('name').max_length
         self.assertEqual(name_max_length, 100)
 
 
