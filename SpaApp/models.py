@@ -121,6 +121,10 @@ class SupplierManager(_Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Types.SUPPLIER)
 
+class CosmethologistManager(_Manager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.COSMETHOLOGIST)
+
 
 class User(AbstractUser):
     objects = UserManager()
@@ -131,6 +135,7 @@ class User(AbstractUser):
         RECEPTIONIST = "RECEPTIONIST", "receptionist"
         ACCOUNTANT = "ACCOUNTANT", "accountant"
         SUPPLIER = "SUPPLIER", "supplier"  # deliverer?
+        COSMETHOLOGIST = "COSMETHOLOGIST", "cosmethologist"
 
     type = models.CharField(
         gettext_lazy("Type"),
@@ -194,6 +199,18 @@ class Supplier(User):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.type = User.Types.SUPPLIER
+        return super().save(*args, **kwargs)
+    
+class Cosmethologist(User):
+    objects = CosmethologistManager()
+    base_type = User.Types.SUPPLIER
+
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.COSMETHOLOGIST
         return super().save(*args, **kwargs)
 
 

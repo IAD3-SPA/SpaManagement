@@ -12,7 +12,7 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product
+from .models import ProductDelivery, Product, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
