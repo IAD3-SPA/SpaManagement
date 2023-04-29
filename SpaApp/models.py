@@ -203,8 +203,8 @@ class Supplier(User):
     
 class Cosmethologist(User):
     objects = CosmethologistManager()
-    base_type = User.Types.SUPPLIER
-
+    base_type = User.Types.COSMETHOLOGIST
+    
     class Meta:
         proxy = True
 
@@ -224,11 +224,25 @@ class Client(models.Model):
 
 
 class Appointment(models.Model):
+    
+    class Types(models.TextChoices):
+        OWNER = "OWNER", "Owner"
+        RECEPTIONIST = "RECEPTIONIST", "Receptionist"
+        ACCOUNTANT = "ACCOUNTANT", "Accountant"
+        SUPPLIER = "SUPPLIER", "Supplier"
+        COSMETHOLOGIST = "COSMETHOLOGIST", "Cosmethologist"
+
     name = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
     time = models.TimeField()
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True)
+    role = models.CharField(
+        max_length=50,
+        choices=Types.choices,
+        default=Types.OWNER,
+        verbose_name=gettext_lazy("Role"),
+    )
 
     def __str__(self):
         return self.name

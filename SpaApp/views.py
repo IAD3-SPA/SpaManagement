@@ -127,7 +127,7 @@ def login_user(request):
             elif is_accountant(user):
                 return render(request, 'accountant_page.html')
             elif is_receptionist(user):
-                return render(request, 'recepiotnist_page.html')
+                return render(request, 'receptionist_page.html')
             elif is_supplier(user):
                 return render(request, 'delivery_page.html')
             return render(request, 'index.html')
@@ -217,7 +217,11 @@ def activate(request, uidb64, token):
     return redirect("index")
 
 def schedule(request):
-    appointments = Appointment.objects.all()
+    role = request.user.type  # assuming that the user's role is stored in the 'type' field
+    if role == 'OWNER':
+        appointments = Appointment.objects.all()
+    else:
+        appointments = Appointment.objects.filter(role=role)
 
     return render(request, 'schedule.html', {'appointments': appointments})
 
