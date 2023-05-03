@@ -196,7 +196,8 @@ class Supplier(User):
             self.type = User.Types.SUPPLIER
         return super().save(*args, **kwargs)
 
-
+'''
+# stary Client nie zmodyfikowany 
 class Client(models.Model): 
     name = models.CharField(max_length=255) 
     surname = models.CharField(max_length=255) 
@@ -204,7 +205,7 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name + " " + self.surname
-
+'''
 
 class Appointment(models.Model):
     name = models.CharField(max_length=200)
@@ -212,17 +213,48 @@ class Appointment(models.Model):
     date = models.DateField()
     time = models.TimeField()
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return self.name
 
 
-class Purchase(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
+class Client(models.Model): 
+    name = models.CharField(max_length=255) 
+    surname = models.CharField(max_length=255) 
+    phone_number = models.CharField(max_length=15)
+    benefits_program = models.FloatField(default=0.0)
 
     def __str__(self):
-        return f"{self.client} purchased {self.product.name} for {self.product.price}"
+        return self.name + " " + self.surname
+
+    def increase_benefits_program(self, order_value):
+        self.benefits_program += order_value
+        self.save()
+
+    def reduce_benefits_program(self, product_value):
+        self.benefits_program -= product_value
+        self.save()
+
+
+class Order(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.product.name} x {self.amount} for {self.client.name} on {self.date}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        order_value = self.product.price * self.amount
+        self.client.increase_benefits_program(order_value)
+
+    def delete(self, *args, **kwargs):
+        order_value = self.product.price * self.amount
+        self.client.reduce_benefits_program(order_value)
+        super().delete(*args, **kwargs)
+
 
 
