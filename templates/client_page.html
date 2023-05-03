@@ -1,10 +1,43 @@
 {% extends "base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
+
 {% block content %}
-
-<h1 class="center">
-    Client Page!
-</h1>
-
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="text-center">Bar with Circles</h1>
+                <div class="progress mt-5">
+                    {% for i in range(10001) %}
+                        {% if i == 0 or i == 10000 %}
+                            <div class="progress-bar bg-dark text-white" style="width: 1%;" role="progressbar" aria-valuenow="{{ i }}" aria-valuemin="0" aria-valuemax="10000">{{ i }}</div>
+                        {% else %}
+                            <div class="progress-bar bg-dark" style="width: 1%;" role="progressbar" aria-valuenow="{{ i }}" aria-valuemin="0" aria-valuemax="10000"></div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <form method="post" class="form-inline justify-content-center my-5">
+                    {% csrf_token %}
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="number-input" class="sr-only">Number input</label>
+                        <input type="number" class="form-control" id="number-input" name="number" min="0" max="10000" placeholder="Enter a number">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                </form>
+                {% if request.method == "POST" %}
+                    {% with value=request.POST.number|default:0 %}
+                        <script>
+                            document.querySelectorAll(".progress-bar").forEach(function(element) {
+                                if (element.getAttribute("aria-valuenow") <= {{ value }}) {
+                                    element.classList.add("bg-success");
+                                } else {
+                                    element.classList.remove("bg-success");
+                                }
+                            });
+                        </script>
+                    {% endwith %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock content %}
