@@ -242,6 +242,7 @@ class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     amount = models.IntegerField()
     date = models.DateField()
+    refunded = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.product.name} x {self.amount} for {self.client.name} on {self.date}"
