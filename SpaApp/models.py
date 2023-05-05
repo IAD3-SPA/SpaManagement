@@ -121,6 +121,10 @@ class SupplierManager(_Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Types.SUPPLIER)
 
+class CosmethologistManager(_Manager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).filter(type=User.Types.COSMETHOLOGIST)
+
 
 class User(AbstractUser):
     objects = UserManager()
@@ -131,6 +135,7 @@ class User(AbstractUser):
         RECEPTIONIST = "RECEPTIONIST", "receptionist"
         ACCOUNTANT = "ACCOUNTANT", "accountant"
         SUPPLIER = "SUPPLIER", "supplier"  # deliverer?
+        COSMETHOLOGIST = "COSMETHOLOGIST", "cosmethologist"
 
     type = models.CharField(
         gettext_lazy("Type"),
@@ -195,6 +200,18 @@ class Supplier(User):
         if not self.pk:
             self.type = User.Types.SUPPLIER
         return super().save(*args, **kwargs)
+    
+class Cosmethologist(User):
+    objects = CosmethologistManager()
+    base_type = User.Types.COSMETHOLOGIST
+    
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.COSMETHOLOGIST
+        return super().save(*args, **kwargs)
 
 
 class Client(models.Model): 
@@ -207,11 +224,25 @@ class Client(models.Model):
 
 
 class Appointment(models.Model):
+    
+    class Types(models.TextChoices):
+        OWNER = "OWNER", "Owner"
+        RECEPTIONIST = "RECEPTIONIST", "Receptionist"
+        ACCOUNTANT = "ACCOUNTANT", "Accountant"
+        SUPPLIER = "SUPPLIER", "Supplier"
+        COSMETHOLOGIST = "COSMETHOLOGIST", "Cosmethologist"
+
     name = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
     time = models.TimeField()
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True)
+    role = models.CharField(
+        max_length=50,
+        choices=Types.choices,
+        default=Types.OWNER,
+        verbose_name=gettext_lazy("Role"),
+    )
 
     def __str__(self):
         return self.name

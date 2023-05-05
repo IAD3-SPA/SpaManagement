@@ -34,6 +34,14 @@ def create_new_user(form):
             email=form.cleaned_data.get("email"),
             password=form.cleaned_data.get("password1")
         )
+    if form.cleaned_data.get("type") == User.Types.COSMETHOLOGIST:
+        return Supplier.objects.create_user(
+            username=form.cleaned_data.get("username"),
+            first_name=form.cleaned_data.get("first_name"),
+            last_name=form.cleaned_data.get("last_name"),
+            email=form.cleaned_data.get("email"),
+            password=form.cleaned_data.get("password1")
+        )
 
 
 def is_owner(user):
