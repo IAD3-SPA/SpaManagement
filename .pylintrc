@@ -2,3 +2,4 @@
 load-plugins=pylint_django
 django-settings-module=SpaManagement.settings
 fail-under=8
+ignore=SpaApp/migrations
