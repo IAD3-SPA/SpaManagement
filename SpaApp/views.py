@@ -12,7 +12,8 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product, Service
+
+from .models import ProductDelivery, Product, Service, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
 
 
@@ -127,7 +128,7 @@ def login_user(request):
             elif is_accountant(user):
                 return render(request, 'accountant_page.html')
             elif is_receptionist(user):
-                return render(request, 'recepiotnist_page.html')
+                return render(request, 'receptionist_page.html')
             elif is_supplier(user):
                 return render(request, 'delivery_page.html')
             return render(request, 'index.html')
@@ -217,7 +218,11 @@ def activate(request, uidb64, token):
     return redirect("index")
 
 def schedule(request):
-    appointments = Appointment.objects.all()
+    role = request.user.type  # assuming that the user's role is stored in the 'type' field
+    if role == 'OWNER':
+        appointments = Appointment.objects.all()
+    else:
+        appointments = Appointment.objects.filter(role=role)
 
     return render(request, 'schedule.html', {'appointments': appointments})
 
