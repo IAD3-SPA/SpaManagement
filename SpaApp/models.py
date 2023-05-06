@@ -230,7 +230,7 @@ class Appointment(models.Model):
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    amount = models.IntegerField()
+    amount = models.IntegerField(default=1)
     date = models.DateField()
     refunded = models.BooleanField(default=False)
 

@@ -193,6 +193,43 @@ def delete_product(request, product_name, delivery_id):
     product_delivery.save()
     return redirect('products_store_page')
 
+def sell_product(request, product_name, delivery_id):
+    product = Product.objects.get(name=product_name, delivery_id=delivery_id)
+    if request.method == 'POST':
+        # Handle form submission
+        client_id = request.POST.get('client')
+        if client_id:
+            client = Client.objects.get(id=client_id)
+            # Create Order object with selected client and product
+            order = Order.objects.create(product=product, client=client)
+            order.save()
+            # Reduce product stock by 1
+            product.total_amount -= 1
+            product.save()
+            return redirect('product_list')
+    else:
+        # Render form
+        clients = Client.objects.all()
+        return render(request, 'sell_product.html', {'product': product, 'clients': clients})
+
+'''
+def sell_product(request, product_name, delivery_id):
+    product_delivery = get_object_or_404(ProductDelivery, name=product_name, delivery_id=delivery_id)
+    client = None  # Initialize client to None
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        if client_id:
+            client = get_object_or_404(Client, pk=client_id)
+            order = Order.objects.create(product=product_delivery.product, client=client, date=datetime.date.today())
+            product_delivery.amount -= 1
+            product_delivery.save()
+            return redirect('client_detail', pk=client.pk)
+    else:
+        clients = Client.objects.all()
+        context = {'clients': clients}
+        return render(request, 'sell_product.html', context)
+'''
+
 
 def change_deficit_status(request, product_name):
     product_delivery = Product.objects.get(name=product_name)

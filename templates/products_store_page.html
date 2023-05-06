@@ -12,12 +12,21 @@
             <img class="card-img-top" src="{{ product.image.url }}">
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
-                <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
-                <h3>Price: {{ product.price }} PLN</h3>
-                <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
-                    {% csrf_token %}
-                    <input type="submit" value="Sold one product">
-                </form>
+              <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
+              <h3>Price: {{ product.price }} PLN</h3>
+              <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="sell-to-registered" class="form-label">Sell to Registered:</label>
+                  <select class="form-select" id="sell-to-registered" name="client">
+                    <option value="" selected disabled>Choose a client</option>
+                    {% for client in clients %}
+                      <option value="{{ client.id }}">{{ client.name }} {{ client.surname }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <input type="submit" value="Sell" class="btn btn-primary">
+              </form>
             </div>
           </div>
         </div>
@@ -25,3 +34,4 @@
     </div>
   </div>
 {% endblock %}
+
