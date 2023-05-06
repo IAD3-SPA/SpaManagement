@@ -13,7 +13,6 @@ urlpatterns = [
     path('delivery_page/', views.delivery_page, name='delivery_page'),
     path('accountant_page/', views.accountant_page, name='accountant_page'),
     path('register/', views.register, name="register"),
-    path('client_register/', views.client_register, name="client_register"),
     path('logout/', views.logout_user, name="logout_user"),
     path('login/', views.login_user, name="login_user"),
     path('product_list/', views.product_list, name='product_list'),
@@ -24,6 +23,7 @@ urlpatterns = [
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
     path('appointment/<int:pk>/', views.appointment, name='appointment'),
-    path('client/', views.client_page, name='client'),
-
+    path('client_register/', views.client_register, name="client_register"),
+    path('clients/', views.client_list, name='client_list'),
+    path('login/<int:client_id>/', views.client_page, name='client_page'),
 ]

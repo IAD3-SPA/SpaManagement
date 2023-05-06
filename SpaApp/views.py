@@ -8,11 +8,13 @@ from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.urls import reverse
+
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product
+from .models import ProductDelivery, Product, Client, Order
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm
 
 
@@ -113,22 +115,6 @@ def register(request):
     form = NewEmployeeForm()
     context = {"form": form}
     return render(request, "templates/register.html", context)
-
-
-def client_register(request):
-    if request.method == "POST":
-        form = ClientForm(request.POST)
-        if form.is_valid():
-            client = form.save(commit=False)
-            client.set_password("dummy_password")
-            client.save()
-            user = authenticate(username=client.username, password="dummy_password")
-            login(request, user)
-            return redirect("client", pk=client.pk)
-    else:
-        form = ClientForm()
-    context = {"form": form}
-    return render(request, "register.html", context)
 
 
 def login_user(request):
@@ -242,6 +228,23 @@ def appointment(request, pk):
     return render(request, 'appointment.html', {'appointment': appointment})
 
 
-def client_page(request):
-    return render(request, 'client_page.html')
+def client_register(request):
+    if request.method == 'POST':
+        form = ClientForm(request.POST)
+        if form.is_valid():
+            client = form.save()
+            return redirect(reverse('client_page', args=[client.id]))
+    else:
+        form = ClientForm()
+    return render(request, 'client_register.html', {'form': form})
+
+
+def client_list(request):
+    clients = Client.objects.all()
+    return render(request, 'client_list.html', {'clients': clients})
+
+
+def client_page(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    return render(request, 'client_page.html', {'client': client})
 
