@@ -148,7 +148,7 @@ def logout_user(request):
 
 def delivery_page(request):
     if request.method == 'POST':
-        form = ProductDeliveryForm(request.POST)
+        form = ProductDeliveryForm(request.POST) 
         if form.is_valid():
             try:
                 delivery_product = form.save()
