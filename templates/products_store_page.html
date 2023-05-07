@@ -14,7 +14,7 @@
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
               <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
               <h3>Price: {{ product.price }} PLN</h3>
-              <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
+              <form action="{% url 'sell_product' product.name product.delivery_id %}" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
                   <label for="sell-to-registered" class="form-label">Sell to Registered:</label>
@@ -25,7 +25,11 @@
                     {% endfor %}
                   </select>
                 </div>
-                <input type="submit" value="Sell" class="btn btn-primary">
+                <input type="submit" value="Sale to Member" class="btn btn-primary">
+              </form>
+              <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Sale to no-Member" class="btn btn-danger">
               </form>
             </div>
           </div>
