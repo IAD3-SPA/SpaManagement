@@ -381,8 +381,6 @@ class ProductListViewTests(TestCase):
         self.delivery1.delete()
         self.delivery2.delete()
         self.delivery3.delete()
-        self.user.delete()
-
 
 
 class ProductDeliveryTest(TestCase):
@@ -463,7 +461,7 @@ class ProductDeliveryTest(TestCase):
             'date': '2023-05-07'
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['amount'], ['Ilość produktów musi być większa lub równa 0.'])
+        self.assertEqual(form.errors['amount'], ['Ilość produktów musi być większa od 0.'])
 
         form = ProductDeliveryForm(data={
             'name': 'Product 1',
@@ -526,4 +524,3 @@ class ServiceListViewTests(TestCase):
         self.delivery1.delete()
         self.delivery2.delete()
         self.delivery3.delete()
-        self.user.delete()

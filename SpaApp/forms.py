@@ -60,14 +60,9 @@ class ProductDeliveryForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
-        
-
-        # validators = {
-        #     'amount': [MinValueValidator(0)]
-        # }
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
-        if amount < 0:
-            raise forms.ValidationError("Ilość produktów musi być większa lub równa 0.")
+        if amount <= 0:
+            raise forms.ValidationError("Ilość produktów musi być większa od 0.")
         return amount
