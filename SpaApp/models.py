@@ -246,7 +246,19 @@ class Appointment(models.Model):
 
     def __str__(self):
         return self.name
+    
 
+class Service(models.Model):
+    """We have our own database of services we have"""
+    code = models.CharField(max_length=50, primary_key=True)
+    service_name = models.CharField(max_length=100)
+    image = models.ImageField(blank=True, null=True, upload_to='images/')
+    price = models.FloatField()
+    description = models.TextField()
+    service_status = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.service_name
 
+    
 
