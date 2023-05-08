@@ -246,6 +246,3 @@ class Order(models.Model):
         order_value = self.product.price * self.amount
         self.client.reduce_benefits_program(order_value)
         super().delete(*args, **kwargs)
-
-
-

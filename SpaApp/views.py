@@ -9,6 +9,8 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.urls import reverse
+import datetime
+
 
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
@@ -183,7 +185,8 @@ def product_list(request):
 
 def products_store_page(request):
     grouped_products = _order_product_by_name(False)
-    context = {'grouped_products': grouped_products.values()}
+    clients = Client.objects.all()
+    context = {'grouped_products': grouped_products.values(), 'clients': clients}
     return render(request, 'products_store_page.html', context)
 
 
@@ -195,17 +198,20 @@ def delete_product(request, product_name, delivery_id):
 
 
 def sell_product(request, product_name, delivery_id):
-    product_delivery = get_object_or_404(ProductDelivery, name=product_name, delivery_id=delivery_id)
-    clients = Client.objects.all()
-    client = None  # Initialize client to None
+    #product_delivery = get_object_or_404(ProductDelivery, name=product_name, delivery_id=delivery_id)
+    product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
+    #product_z = get_object_or_404(Product, name=product_name)
+    product_z = Product.objects.get(name=product_name)
+    #clients = Client.objects.all()
+    #client = None  # Initialize client to None
     if request.method == 'POST':
         client_id = request.POST.get('client')
         if client_id:
-            client = get_object_or_404(Client, pk=client_id)
-            order = Order.objects.create(product=product_delivery.product, client=client, date=datetime.date.today())
+            client = Client.objects.get(pk=client_id)
+            order = Order.objects.create(product=product_z, client=client, date=datetime.date.today())
             product_delivery.amount -= 1
             product_delivery.save()
-            return redirect('client_detail', pk=client.pk)
+            return redirect('client_page', client_id=client.pk)
   #  context = {'clients': clients}
    # return render(request, 'sell_product.html', context)
 
