@@ -12,7 +12,8 @@ from django.conf import settings
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product, Appointment
+
+from .models import ProductDelivery, Product, Service, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, AppointmentClientForm, AppointmentForm
 
 
@@ -232,6 +233,7 @@ def appointment(request, pk):
         return redirect("schedule")
     return render(request, 'appointment.html', {'appointment': appointment})
 
+
 @login_required(login_url="login_user")
 @user_passes_test(is_owner_or_receptionist, login_url="index")
 def new_appointment(request):
@@ -285,3 +287,29 @@ def update_appointment(request, appointment_id):
     }
 
     return render(request, "update_appointment.html", context)
+def service_list(request):
+    list_services = Service.objects.all().order_by('service_name')
+    grouped_services = {}
+    for service in list_services:
+        grouped_services[service.service_name] = {
+            'name': service.service_name,
+            'price': service.price,
+            'description': service.description,
+            'image': service.image,
+            'service_status': service.service_status
+        }
+
+    if request.method == 'POST':
+        service_name = request.POST.get('service_name')
+        service = Service.objects.get(code=service_name)
+        service.service_status = not service.service_status 
+        service.save() 
+           
+    context = {'grouped_services': grouped_services.values()}
+    return render(request, 'services.html', context)
+
+def change_service_status(request, service_name):
+    service = Service.objects.get(service_name=service_name)
+    service.service_status = not service.service_status
+    service.save()
+    return redirect('services')
