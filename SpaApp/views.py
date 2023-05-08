@@ -14,7 +14,7 @@ from .utils import create_new_user, is_accountant, is_owner, is_owner_or_account
 from .tokens import account_activation_token
 
 from .models import ProductDelivery, Product, Service, Appointment
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, AppointmentClientForm, AppointmentForm
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -228,8 +228,65 @@ def schedule(request):
 
 def appointment(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
+    if request.method == "POST":
+        appointment.delete()
+        return redirect("schedule")
     return render(request, 'appointment.html', {'appointment': appointment})
 
+
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
+def new_appointment(request):
+
+    if request.method == "POST":
+        form = AppointmentClientForm(request.POST)
+        if not form.is_valid():
+            messages.warning(request, "Data spotania nie może być wcześniejsza niż pół godziny od teraz.")
+            return redirect("new_appointment")
+        appointment = form["appointment"].save(commit=False)
+        appointment.employee = User.objects.get(id=form["appointment"].cleaned_data.get("employee"))
+        if not None in form["client"].cleaned_data.values():
+            client = form["client"].save()
+            appointment.client = client
+        print(appointment.employee.type)
+        appointment.role = appointment.employee.type
+        appointment.save()
+        messages.success(request, "Dodano nowe spotkanie")
+        if is_receptionist(request.user):
+            return redirect("receptionist_page") 
+        elif is_owner(request.user):
+            return redirect("owner_page")
+        else:
+            return HttpResponseNotFound("Kim jesteś?")
+    form = AppointmentClientForm()
+    context = {"form": form}
+    return render(request, 'new_appointment.html', context)
+
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
+def update_appointment(request, appointment_id):
+
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    
+    form = AppointmentForm(request.POST or None, instance=appointment)
+    if request.method == "POST":
+
+        if not form.is_valid():
+            print(form.cleaned_data)
+            messages.warning(request, "Nie udało się aktualizować spotkania!!")
+            return redirect("update_appointment", appointment_id=appointment_id)
+        form.save(commit=False)
+        appointment.role = User.objects.get(id=form.cleaned_data.get("employee")).type
+        form.save()
+        messages.success(request, "Zmieniono termin wizyty")
+        return redirect("schedule")
+    
+    context = {
+        "form": form,
+        "appointment": appointment,
+    }
+
+    return render(request, "update_appointment.html", context)
 def service_list(request):
     list_services = Service.objects.all().order_by('service_name')
     grouped_services = {}

@@ -20,7 +20,11 @@
           <td>{{ appointment.name }}</td>
           <td>{{ appointment.date }}</td>
           <td>{{ appointment.time }}</td>
-          <td>{{ appointment.client }}</td>
+          {% if appointment.client is not None %}
+          <td>{{ appointment.client.name }}</td>
+          {% else %}
+          <td>Brak</td>
+          {% endif %}
           <td>{{ appointment.role }}</td>
           <td><a href="{% url 'appointment' appointment.id %}" style="color:black">Szczegóły</a></td>
         </tr>

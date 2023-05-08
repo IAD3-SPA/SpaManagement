@@ -24,4 +24,8 @@ urlpatterns = [
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
     path('appointment/<int:pk>/', views.appointment, name='appointment'),
+    path('new_appointment/', views.new_appointment, name='new_appointment'),
+    path('update_appointment/<int:appointment_id>', views.update_appointment, name='update_appointment'),
+    
+ 
 ]

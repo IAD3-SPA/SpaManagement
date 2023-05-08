@@ -134,7 +134,7 @@ class User(AbstractUser):
         OWNER = "OWNER", "owner"
         RECEPTIONIST = "RECEPTIONIST", "receptionist"
         ACCOUNTANT = "ACCOUNTANT", "accountant"
-        SUPPLIER = "SUPPLIER", "supplier"  # deliverer?
+        SUPPLIER = "SUPPLIER", "supplier"  
         COSMETHOLOGIST = "COSMETHOLOGIST", "cosmethologist"
 
     type = models.CharField(
@@ -215,9 +215,9 @@ class Cosmethologist(User):
 
 
 class Client(models.Model): 
-    name = models.CharField(max_length=255) 
-    surname = models.CharField(max_length=255) 
-    phone_number = models.CharField(max_length=15)
+    name = models.CharField(max_length=255, null=True, blank=True) 
+    surname = models.CharField(max_length=255, null=True, blank=True) 
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + self.surname
@@ -243,6 +243,8 @@ class Appointment(models.Model):
         default=Types.OWNER,
         verbose_name=gettext_lazy("Role"),
     )
+    employee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return self.name
