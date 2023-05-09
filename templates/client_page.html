@@ -1,5 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% block content %}
+
 <h1>{{ client.name }} {{ client.surname }}</h1>
 <p>ID: {{ client.id }}</p>
 <p>Benefits program: {{ client.benefits_program }}</p>
 <p>Phone number: {{ client.phone_number }}</p>
 
+
+{% endblock content %}
