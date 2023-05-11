@@ -19,10 +19,13 @@
 
 
 
-<h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
+<h1>Witaj <strong>{{ client.name }} {{ client.surname }} !</strong></h1>
+<p>Jesteś jednym z naszych najlepszych klientów!</p>
+<p>Twoja liczba punktów w programie to : <strong>{{ client.benefits_program }} </strong></p>
+<p>Tutaj na dole są twoje atrakcyjne nagrody , zerknij , a sie nie rozczarujesz!</p>
+<p> Alternatywnie możesz też poniższym przyciskiem  cofnąć się na stronę twojego profilu ale nie polecam </p>
+<a href="#" onclick="window.history.back();" aria-label="Cofnij" class="btn btn-dark">Cofnij</a>
+
 
 <h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}}</h1>
 
@@ -168,27 +171,20 @@ section#timeline article:nth-child(5) div.inner h2:after {
 
 
 
-
-
-<h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
-
-<h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}}</h1>
-
-
 <section id="timeline">
     {% for product in grouped_products %}
         {% if forloop.counter == 1%}
         <article>
         <div class="inner">
-        </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
+        <a><strong><span style="font-size: 50px; color: black;">20 PUNKTÓW</span></strong></a>
+
+            <h2><strong> Piana z której wynurzyła się Afrodyta!</strong></h2>
             <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
+            {% if client.benefits_program < 20 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger">
+            {% endif %}  
         </div>
         </article>
         {% endif %}
@@ -196,12 +192,14 @@ section#timeline article:nth-child(5) div.inner h2:after {
         {% if forloop.counter == 2%}
         <article>
         <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
+            <a><strong><span style="font-size: 50px; color: black;">40 PUNKTÓW</span></strong></a>
+            <h2><strong>Błoto z Bagna Shreka</strong></h2>
             <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
+            {% if client.benefits_program < 40 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
         </div>
         </article>
         {% endif %}
@@ -209,11 +207,13 @@ section#timeline article:nth-child(5) div.inner h2:after {
         {% if forloop.counter == 3%}
         <article>
         <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
+            <a><strong><span style="font-size: 50px; color: black;">60 PUNKTÓW</span></strong></a>
+            <h2><strong>Elegancki Śluz z nosa Shreka</strong></h2>
             <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
+            {% if client.benefits_program >= 60 %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger">
+            {% else %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
             {% endif %}   
         </div>
         </article>
@@ -222,12 +222,14 @@ section#timeline article:nth-child(5) div.inner h2:after {
         {% if forloop.counter == 4%}
         <article>
         <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
+            <a><strong><span style="font-size: 50px; color: black;">80 PUNKTÓW</span></strong></a>
+            <h2><strong>Lawendowe Perfumy Księcia z Bajki</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">  
+            {% if client.benefits_program < 80 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
         </div>
         </article>
         {% endif %}
@@ -235,29 +237,23 @@ section#timeline article:nth-child(5) div.inner h2:after {
         {% if forloop.counter == 5%}
         <article>
         <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
+            <a><strong><span style="font-size: 50px; color: black;">9999 PUNKTÓW</span></strong></a>
+            <h2><strong>Święty olej Ręczny z antiochii</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">  
+            {% if client.benefits_program < 9999 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
         </div>
         </article>
         {% endif %}
-        {% endfor %}
+    {% endfor %}
   </section>
 
 
             
 </div>
-
-
-<!--
-
-<h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
 
 
 {% endblock content %}
@@ -272,4 +268,3 @@ section#timeline article:nth-child(5) div.inner h2:after {
 		<a target="_blank" href="https://www.florin-pop.com/blog/2019/04/how-to-create-a-timeline-with-react/">blog</a>
 	</p>
 </footer>
--->

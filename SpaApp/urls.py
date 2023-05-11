@@ -27,4 +27,5 @@ urlpatterns = [
     path('client_register/', views.client_register, name="client_register"),
     path('clients/', views.client_list, name='client_list'),
     path('login/<int:client_id>/', views.client_page, name='client_page'),
+    path('login/<int:client_id>/loyal/', views.loyal_page, name='loyal_page'),
 ]

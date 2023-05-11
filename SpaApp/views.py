@@ -198,12 +198,8 @@ def delete_product(request, product_name, delivery_id):
 
 
 def sell_product(request, product_name, delivery_id):
-    #product_delivery = get_object_or_404(ProductDelivery, name=product_name, delivery_id=delivery_id)
     product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
-    #product_z = get_object_or_404(Product, name=product_name)
     product_z = Product.objects.get(name=product_name)
-    #clients = Client.objects.all()
-    #client = None  # Initialize client to None
     if request.method == 'POST':
         client_id = request.POST.get('client')
         if client_id:
@@ -212,8 +208,6 @@ def sell_product(request, product_name, delivery_id):
             product_delivery.amount -= 1
             product_delivery.save()
             return redirect('client_page', client_id=client.pk)
-  #  context = {'clients': clients}
-   # return render(request, 'sell_product.html', context)
 
 
 
@@ -269,5 +263,16 @@ def client_list(request):
 
 def client_page(request, client_id):
     client = get_object_or_404(Client, id=client_id)
-    return render(request, 'client_page.html', {'client': client})
+    grouped_products = _order_product_by_name(False)
+    context = {'grouped_products': grouped_products.values(), 'client': client}
+    return render(request, 'client_page.html', context)
+
+def loyal_page(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    #orders = Order.objects.get(name=product_name, delivery_id=delivery_id)
+    #orders = get_object_or_404(Order, id=client_id)
+    grouped_products = _order_product_by_name(False)
+    context = {'grouped_products': grouped_products.values(), 'client': client,}
+    return render(request, 'loyal_page.html', context)
+
 
