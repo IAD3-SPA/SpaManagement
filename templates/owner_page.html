@@ -57,8 +57,13 @@
         <div class="card-body">
           <h5 class="card-title">Klient!</h5>
           <p class="card-text">Obsłuż zarejestrowanych Klientów lub Dodaj nowych!</p>
-          
           <a href="{% url 'client_register' %}" class="btn" style="background-color: #FFB6C1;">Dodaj</a>
+          <select class="form-select" id="sell-to-registered" name="client">
+            <option value="" selected disabled>Choose a client</option>
+            {% for client in clients %}
+              <option value="{{ client.id }}">{{ client.name }} {{ client.surname }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
     </div>

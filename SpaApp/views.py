@@ -124,6 +124,7 @@ def login_user(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
             login(request, user)
             if is_owner(user):
@@ -139,8 +140,8 @@ def login_user(request):
         return redirect("login_user")
 
     form = LoginForm()
-
-    context = {"form": form}
+    clients = Client.objects.all()
+    context = {"form": form , 'clients': clients}
     return render(request, "templates/login.html", context)
 
 
@@ -196,6 +197,18 @@ def delete_product(request, product_name, delivery_id):
     product_delivery.save()
     return redirect('products_store_page')
 
+def refund_product(request, product_name, client_id, order_id):
+    product_delivery = ProductDelivery.objects.get(name=product_name)
+    product_z = Product.objects.get(name=product_name)
+    client = Client.objects.get(pk=client_id)
+    orders2 = Order.objects.filter(client=client)
+    orders3 = orders2.get(id=order_id)
+    client.benefits_program -= product_z.price
+    product_delivery.amount += 1
+    product_delivery.save()
+    orders3.refunded = True
+    orders3.save()
+    return redirect('client_page', client_id=client.pk)
 
 def sell_product(request, product_name, delivery_id):
     product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
@@ -263,16 +276,20 @@ def client_list(request):
 
 def client_page(request, client_id):
     client = get_object_or_404(Client, id=client_id)
+    orders = Order.objects.filter(client=client)
     grouped_products = _order_product_by_name(False)
-    context = {'grouped_products': grouped_products.values(), 'client': client}
+    context = {'grouped_products': grouped_products.values(), 'client': client, 'orders' : orders}
     return render(request, 'client_page.html', context)
 
 def loyal_page(request, client_id):
     client = get_object_or_404(Client, id=client_id)
-    #orders = Order.objects.get(name=product_name, delivery_id=delivery_id)
-    #orders = get_object_or_404(Order, id=client_id)
     grouped_products = _order_product_by_name(False)
     context = {'grouped_products': grouped_products.values(), 'client': client,}
     return render(request, 'loyal_page.html', context)
 
+def go_to_client(request):
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        if client_id:
+            return redirect(reverse('client_page', args=[client_id]))
 

@@ -17,247 +17,130 @@
   </script>
 {% endblock %}
 
-
-
-<h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
-
-<h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}}</h1>
-
-
 <style>
+table { 
+	width: 750px; 
+	border-collapse: collapse; 
+	margin:50px auto;
+	}
 
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: Helvetica, sans-serif;
-}
-body {
-  background: #25303B;
-}
-section#timeline {
-  width: 80%;
-  margin: 20px auto;
-  position: relative;
-}
-section#timeline:before {
-  content: '';
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: 0;
-  margin: 0 0 0 -1px;
-  width: 2px;
-  height: 100%;
-  background: rgba(255,255,255,0.2);
-}
-section#timeline article {
-  width: 100%;
-  margin: 0 0 20px 0;
-  position: relative;
-}
-section#timeline article:after {
-  content: '';
-  display: block;
-  clear: both;
-}
-section#timeline article div.inner {
-  width: 40%;
-  float: left;
-  margin: 5px 0 0 0;
-  border-radius: 6px;
-}
-section#timeline article div.inner span.date {
-  display: block;
-  width: 60px;
-  height: 50px;
-  padding: 5px 0;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  margin: 0 0 0 -32px;
-  border-radius: 100%;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-  background: #25303B;
-  color: rgba(255,255,255,0.5);
-  border: 2px solid rgba(255,255,255,0.2);
-  box-shadow: 0 0 0 7px #25303B;
-}
-section#timeline article div.inner span.date span {
-  display: block;
-  text-align: center;
-}
-section#timeline article div.inner span.date span.day {
-  font-size: 10px;
-}
-section#timeline article div.inner span.date span.month {
-  font-size: 18px;
-}
-section#timeline article div.inner span.date span.year {
-  font-size: 10px;
-}
-section#timeline article div.inner h2 {
-  padding: 15px;
-  margin: 0;
-  color: #fff;
-  font-size: 20px;
-  text-transform: uppercase;
-  letter-spacing: -1px;
-  border-radius: 6px 6px 0 0;
-  position: relative;
-}
-section#timeline article div.inner h2:after {
-  content: '';
-  position: absolute;
-  top: 20px;
-  right: -5px;
-  	width: 10px; 
-	  height: 10px;
-  -webkit-transform: rotate(-45deg);
-}
-section#timeline article div.inner p {
-  padding: 15px;
-  margin: 0;
-  font-size: 14px;
-  background: #fff;
-  color: #656565;
-  border-radius: 0 0 6px 6px;
-}
-section#timeline article:nth-child(2n+2) div.inner {
-  float: right;
-}
-section#timeline article:nth-child(2n+2) div.inner h2:after {
-  left: -5px;
-}
-section#timeline article:nth-child(1) div.inner h2 {
-  background: #e74c3c;
-}
-section#timeline article:nth-child(1) div.inner h2:after {
-  background: #e74c3c;
-}
-section#timeline article:nth-child(2) div.inner h2 {
-  background: #2ecc71;
-}
-section#timeline article:nth-child(2) div.inner h2:after {
-  background: #2ecc71;
-}
-section#timeline article:nth-child(3) div.inner h2 {
-  background: #e67e22;
-}
-section#timeline article:nth-child(3) div.inner h2:after {
-  background: #e67e22;
-}
-section#timeline article:nth-child(4) div.inner h2 {
-  background: #1abc9c;
-}
-section#timeline article:nth-child(4) div.inner h2:after {
-  background: #1abc9c;
-}
-section#timeline article:nth-child(5) div.inner h2 {
-  background: #9b59b6;
-}
-section#timeline article:nth-child(5) div.inner h2:after {
-  background: #9b59b6;
-}
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+	background: #eee; 
+	}
 
+th { 
+	background: #3498db; 
+	color: white; 
+	font-weight: bold; 
+	}
+
+td, th { 
+	padding: 10px; 
+	border: 1px solid #ccc; 
+	text-align: left; 
+	font-size: 18px;
+	}
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	table { 
+	  	width: 100%; 
+	}
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr { border: 1px solid #ccc; }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		/* Label the data */
+		content: attr(data-column);
+
+		color: #000;
+		font-weight: bold;
+	}
+
+}
 </style>
 
-
-
-
-
+<h1><strong>To jest strona klienta :</strong></h1>
 <h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
+<p>Numer ID klienta : <strong>{{ client.id }}</strong></p>
+<p>Ilość punktów w programie lojalnościowym : <strong>{{ client.benefits_program }}</strong> </p>
+<p>Numer telefonu klienta : <strong>{{ client.phone_number }}</strong></p>
 
 <h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}}</h1>
 
-
-<section id="timeline">
-    {% for product in grouped_products %}
-        {% if forloop.counter == 1%}
-        <article>
-        <div class="inner">
-        </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
-        </div>
-        </article>
-        {% endif %}
-
-        {% if forloop.counter == 2%}
-        <article>
-        <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
-        </div>
-        </article>
-        {% endif %}
-
-        {% if forloop.counter == 3%}
-        <article>
-        <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
-        </div>
-        </article>
-        {% endif %}
-
-        {% if forloop.counter == 4%}
-        <article>
-        <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
-        </div>
-        </article>
-        {% endif %}
-
-        {% if forloop.counter == 5%}
-        <article>
-        <div class="inner">
-            </a> <strong>55 pkt </strong>   <a>
-            <h2><strong>{{ product.name }}</strong></h2>
-            <img class="card-img-top" src="{{ product.image.url }}">
-            {% if client.benefits_program >= 55 %}
-            <input type="submit" value="CLAIMED!" class="btn btn-danger" , color="blue">
-            {% endif %}   
-        </div>
-        </article>
-        {% endif %}
-        {% endfor %}
-  </section>
+<button type="button" onclick="window.location.href='/login/{{ client.id }}/loyal/';" class="btn btn-primary">Przejdź do strony programu lojalnościowego</button>
+<button type="button" onclick="window.location.href='/login/';" class="btn btn-primary">Powrót do strony logowania</button>
 
 
+<table>
+    <thead>
+      <tr>
+        <th>Produkt</th>
+        <th>Ilość</th>
+        <th>Status Zwrotu</th>
+        <th>Zwróć</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td data-column="Produkt">{{ order.product}}</td>
+            <td data-column="Ilość">{{ order.amount}}</td>
+            <td data-column="Status Zwrotu">{{order.refunded}}</td>
+            <td data-column="Zwróć">
+              {% if order.refunded %}
+                <button disabled style="background-color: gray;">Zwrócono</button>
+              {% else %}
+                <a href="{% url 'refund_product' order.product order.client.id  order.id %}" class="btn btn-dark">Zwróć</a>
+                path('refund_product/<str:product_name>/<int:delivery_id>/<int:client_id>/<int:orders>', views.refund_product, name='refund_product'),
+              {% endif %}
+              </td>
             
-</div>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
 
 
-<!--
 
-<h1>{{ client.name }} {{ client.surname }}</h1>
-<p>ID: {{ client.id }}</p>
-<p>Benefits program: {{ client.benefits_program }}</p>
-<p>Phone number: {{ client.phone_number }}</p>
+
+
 
 
 {% endblock content %}

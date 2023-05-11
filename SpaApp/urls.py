@@ -20,6 +20,7 @@ urlpatterns = [
     path('products_store_page/', views.products_store_page, name='products_store_page'),
     path('delete_product/<str:product_name>/<int:delivery_id>/', views.delete_product, name='delete_product'),
     path('sell_product/<str:product_name>/<int:delivery_id>/', views.sell_product, name='sell_product'),
+    path('refund_product/<str:product_name>/<int:client_id>/<int:order_id>', views.refund_product, name='refund_product'),
     path('help/', views.help, name='help'),
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
