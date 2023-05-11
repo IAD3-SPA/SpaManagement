@@ -3,7 +3,7 @@ from datetime import timedelta, date, time, timezone, datetime
 
 from django.contrib.auth import get_user_model
 
-from .models import Supplier, Accountant, Receptionist, Storage, Product, ProductDelivery
+from .models import Supplier, Accountant, Receptionist, Storage, Product, ProductDelivery, Cosmethologist
 
 User = get_user_model()
 
@@ -11,37 +11,24 @@ User = get_user_model()
 def create_new_user(form):
     """create new user by roles"""
     if form.cleaned_data.get("type") == User.Types.RECEPTIONIST:
-        return Receptionist.objects.create_user(
-            username=form.cleaned_data.get("username"),
-            first_name=form.cleaned_data.get("first_name"),
-            last_name=form.cleaned_data.get("last_name"),
-            email=form.cleaned_data.get("email"),
-            password=form.cleaned_data.get("password1")
-        )
-    if form.cleaned_data.get("type") == User.Types.ACCOUNTANT:
-        return Accountant.objects.create_user(
-            username=form.cleaned_data.get("username"),
-            first_name=form.cleaned_data.get("first_name"),
-            last_name=form.cleaned_data.get("last_name"),
-            email=form.cleaned_data.get("email"),
-            password=form.cleaned_data.get("password1")
-        )
-    if form.cleaned_data.get("type") == User.Types.SUPPLIER:
-        return Supplier.objects.create_user(
-            username=form.cleaned_data.get("username"),
-            first_name=form.cleaned_data.get("first_name"),
-            last_name=form.cleaned_data.get("last_name"),
-            email=form.cleaned_data.get("email"),
-            password=form.cleaned_data.get("password1")
-        )
-    if form.cleaned_data.get("type") == User.Types.COSMETHOLOGIST:
-        return Supplier.objects.create_user(
-            username=form.cleaned_data.get("username"),
-            first_name=form.cleaned_data.get("first_name"),
-            last_name=form.cleaned_data.get("last_name"),
-            email=form.cleaned_data.get("email"),
-            password=form.cleaned_data.get("password1")
-        )
+        model = Receptionist
+    elif form.cleaned_data.get("type") == User.Types.ACCOUNTANT:
+        model = Accountant
+    elif form.cleaned_data.get("type") == User.Types.SUPPLIER:
+        model = Supplier
+    elif form.cleaned_data.get("type") == User.Types.COSMETHOLOGIST:
+        # FIXME: Czemu przy COSMETHOLOGIST byl model Supplier
+        model = Cosmethologist
+    else:
+        raise TypeError("Brak danego typu")
+
+    return model.objects.create_user(
+        username=form.cleaned_data.get("username"),
+        first_name=form.cleaned_data.get("first_name"),
+        last_name=form.cleaned_data.get("last_name"),
+        email=form.cleaned_data.get("email"),
+        password=form.cleaned_data.get("password1")
+    )
 
 
 def is_owner(user):
@@ -125,8 +112,8 @@ def _create_expired_product_message(expired_products) -> Union[str, None]:
 
     if len(expired_products) <= 0:
         return message
-    else:
-        message = ''
+
+    message = ''
 
     for name, days_left in expired_products:
         message += f"- {name}, {days_left} days\n"
@@ -147,7 +134,7 @@ def _check_expiry_date(product, delivery, days_top, days_bottom) -> Tuple[bool, 
     return is_expired, time_left
 
 
-def _order_product_by_name(defifit_booelan) -> Dict[str, any]:
+def order_product_by_name(defifit_booelan) -> Dict[str, any]:
     products_list = ProductDelivery.objects.all().order_by('name')
     products_store = Product.objects.all().order_by('name')
     grouped_products = {}
@@ -169,22 +156,24 @@ def _order_product_by_name(defifit_booelan) -> Dict[str, any]:
                     'image': products_store.get(name=product.name).image,
                     'price': products_store.get(name=product.name).price,
                     'delivery_id': product.delivery_id
-            }
+                }
     return grouped_products
 
-class FormsAttr:
-    """Class for forms widgets"""
-    @staticmethod
-    def forms_attrs(placeholder: Union[str, None]) -> dict[str: Union[str, None]]: 
-        return {
-            "class": "form-control my-3",
-            "placeholder": placeholder,
-        }
 
-def get_next_hour() -> time:
+def forms_attrs(placeholder: Union[str, None]) -> dict[str: Union[str, None]]:
+    """Function for form widget"""
+    return {
+        "class": "form-control my-3",
+        "placeholder": placeholder,
+    }
+
+
+def get_next_hour() -> str:
     """Check current hour and return """
-    ti = datetime.now(timezone(timedelta(hours=1))) + timedelta(minutes=30)
-    ti = ti.hour + 1 if ti.hour == datetime.now().hour else ti.hour + 2
-    if ti >= 24: ti = 0
-    return time(ti, 0).strftime("%H:%M")
+    current_time = datetime.now(timezone(timedelta(hours=1))) + timedelta(minutes=30)
+    current_time = current_time.hour + 1 if current_time.hour == datetime.now().hour else current_time.hour + 2
 
+    if current_time >= 24:
+        current_time = 0
+
+    return time(current_time, 0).strftime("%H:%M")

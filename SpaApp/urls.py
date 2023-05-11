@@ -7,9 +7,9 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('services/', views.service_list, name='services'),
     path('contact/', views.contact, name='contact'),
-    path('products/', views.products, name='products'),    
+    path('products/', views.products, name='products'),
     path('receptionist_page/', views.receptionist_page, name='receptionist_page'),
-    path('owner_page/', views.owner_page, name='owner_page'),           
+    path('owner_page/', views.owner_page, name='owner_page'),
     path('delivery_page/', views.delivery_page, name='delivery_page'),
     path('accountant_page/', views.accountant_page, name='accountant_page'),
     path('register/', views.register, name="register"),
@@ -20,12 +20,10 @@ urlpatterns = [
     path('change_service_status/<str:service_name>/', views.change_service_status, name='change_service_status'),
     path('products_store_page/', views.products_store_page, name='products_store_page'),
     path('delete_product/<str:product_name>/<int:delivery_id>/', views.delete_product, name='delete_product'),
-    path('help/', views.help, name='help'),
+    path('help/', views.help_view, name='help'),
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
     path('appointment/<int:pk>/', views.appointment, name='appointment'),
     path('new_appointment/', views.new_appointment, name='new_appointment'),
     path('update_appointment/<int:appointment_id>', views.update_appointment, name='update_appointment'),
-    
- 
 ]

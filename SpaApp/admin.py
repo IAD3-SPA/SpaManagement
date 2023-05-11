@@ -26,7 +26,7 @@ class UserAdmin(admin.ModelAdmin):
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'surname', 'phone_number')
 
+
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'date', 'time', 'client')
-
