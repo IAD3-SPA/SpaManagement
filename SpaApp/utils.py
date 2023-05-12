@@ -3,7 +3,7 @@ from datetime import timedelta, date, time, timezone, datetime
 
 from django.contrib.auth import get_user_model
 
-from .models import Supplier, Accountant, Receptionist, Storage, Product, ProductDelivery
+from .models import Supplier, Accountant, Receptionist, Storage, Product, ProductDelivery, Cosmethologist
 
 User = get_user_model()
 
@@ -35,7 +35,7 @@ def create_new_user(form):
             password=form.cleaned_data.get("password1")
         )
     if form.cleaned_data.get("type") == User.Types.COSMETHOLOGIST:
-        return Supplier.objects.create_user(
+        return Cosmethologist.objects.create_user(
             username=form.cleaned_data.get("username"),
             first_name=form.cleaned_data.get("first_name"),
             last_name=form.cleaned_data.get("last_name"),
@@ -58,6 +58,9 @@ def is_accountant(user):
 
 def is_supplier(user):
     return user.type == User.Types.SUPPLIER
+
+def is_cosmethologist(user):
+    return user.type == User.Types.COSMETHOLOGIST
 
 
 def is_owner_or_receptionist(user):

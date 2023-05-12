@@ -10,7 +10,8 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
-    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, \
+        create_warning_message, _order_product_by_name, is_cosmethologist
 from .tokens import account_activation_token
 
 from .models import ProductDelivery, Product, Service, Appointment
@@ -135,6 +136,9 @@ def login_user(request):
             elif is_supplier(user):
                 messages.success(request, "Zalogowałeś się jako dostawca :)")
                 return render(request, 'delivery_page.html')
+            elif is_cosmethologist(user):
+                messages.success(request, "Zalogowałeś się jako kosmetolog :)")
+                return render(request, 'cosmethologist_page.html')
             return render(request, 'index.html')
         messages.error(request, "Nie udało się zalogować")
         return redirect("login_user")
