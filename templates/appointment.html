@@ -14,5 +14,12 @@
     <dd>{{ appointment.time }}</dd>
     <dt>Klient:</dt>
     <dd>{{ appointment.client }}</dd>
+    <dt>Pracownik:</dt>
+    <dd>{{ appointment.role }}</dd>
   </dl>
+  <form method="POST">
+    {% csrf_token %}
+    <input type="submit" class="btn btn-lg btn-danger" value="Usuń spotkanie">
+    <a href="{% url 'update_appointment' appointment.id%}" class="btn btn-lg btn-primary">Edytuj spotkanie</a>
+  </form>
 {% endblock %}

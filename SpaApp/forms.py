@@ -1,9 +1,14 @@
+from datetime import datetime,date
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import ProductDelivery
+from .models import ProductDelivery, Client, Appointment
 from django.forms import DateInput
 from .models import Client
+
+from betterforms.multiform import MultiModelForm
+from .utils import FormsAttr, get_next_hour
 
 user = get_user_model()
 
@@ -78,3 +83,56 @@ class ClientForm(forms.ModelForm):
         return client
 
 
+def _get_employee_list() -> list[tuple[int, str]]:
+    """return list of emplyee"""
+    users = user.objects.all()
+    return [(user.id, user.username) for user in users]
+
+class AppointmentForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
+    description = forms.CharField(widget=forms.Textarea, required=False)
+
+    employee = forms.ChoiceField(choices=_get_employee_list(),
+                                 widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+    class Meta:
+        model = Appointment
+        fields = ["name", "description", "date", "time"]
+
+    def __init__(self, *args, **kwargs):
+        super(AppointmentForm, self).__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Nazwa"))
+        self.fields["description"].widget.attrs.update(
+            FormsAttr.forms_attrs("Informacje dodatkowe"))
+        self.fields["date"].widget.attrs.update(FormsAttr.forms_attrs("Data"))
+        self.fields["time"].widget.attrs.update(FormsAttr.forms_attrs("Godzina"))
+        self.initial["time"] = get_next_hour()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date = self.cleaned_data.get('date')
+        time = self.cleaned_data.get('time')
+        if date and time:
+            if date < date.today() or time < datetime.now().time():
+                raise forms.ValidationError("Podana data jest przeszła.")
+        return cleaned_data
+
+'''
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ["name", "surname", "phone_number"]
+    def __init__(self, *args, **kwargs):
+        super(ClientForm, self).__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Imie"))
+        self.fields["surname"].widget.attrs.update(FormsAttr.forms_attrs("Nazwisko"))
+        self.fields["phone_number"].widget.attrs.update(FormsAttr.forms_attrs("+48..."))
+'''
+
+class AppointmentClientForm(MultiModelForm):
+    form_classes = {
+        "client": ClientForm,
+        "appointment": AppointmentForm
+    }

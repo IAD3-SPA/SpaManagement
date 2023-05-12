@@ -16,8 +16,9 @@ import datetime
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product, Client, Order
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm
+from .models import ProductDelivery, Product, Client, Order,  Service, Appointment
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, AppointmentClientForm, AppointmentForm
+
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -132,7 +133,7 @@ def login_user(request):
             elif is_accountant(user):
                 return render(request, 'accountant_page.html')
             elif is_receptionist(user):
-                return render(request, 'recepiotnist_page.html')
+                return render(request, 'receptionist_page.html')
             elif is_supplier(user):
                 return render(request, 'delivery_page.html')
             return render(request, 'index.html')
@@ -249,12 +250,19 @@ def activate(request, uidb64, token):
     return redirect("index")
 
 def schedule(request):
-    appointments = Appointment.objects.all()
+    role = request.user.type  # assuming that the user's role is stored in the 'type' field
+    if role == 'OWNER':
+        appointments = Appointment.objects.all()
+    else:
+        appointments = Appointment.objects.filter(role=role)
 
     return render(request, 'schedule.html', {'appointments': appointments})
 
 def appointment(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
+    if request.method == "POST":
+        appointment.delete()
+        return redirect("schedule")
     return render(request, 'appointment.html', {'appointment': appointment})
 
 
@@ -293,3 +301,82 @@ def go_to_client(request):
         if client_id:
             return redirect(reverse('client_page', args=[client_id]))
 
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
+def new_appointment(request):
+
+    if request.method == "POST":
+        form = AppointmentClientForm(request.POST)
+        if not form.is_valid():
+            messages.warning(request, "Data spotania nie może być wcześniejsza niż pół godziny od teraz.")
+            return redirect("new_appointment")
+        appointment = form["appointment"].save(commit=False)
+        appointment.employee = User.objects.get(id=form["appointment"].cleaned_data.get("employee"))
+        if not None in form["client"].cleaned_data.values():
+            client = form["client"].save()
+            appointment.client = client
+        print(appointment.employee.type)
+        appointment.role = appointment.employee.type
+        appointment.save()
+        messages.success(request, "Dodano nowe spotkanie")
+        if is_receptionist(request.user):
+            return redirect("receptionist_page") 
+        elif is_owner(request.user):
+            return redirect("owner_page")
+        else:
+            return HttpResponseNotFound("Kim jesteś?")
+    form = AppointmentClientForm()
+    context = {"form": form}
+    return render(request, 'new_appointment.html', context)
+
+@login_required(login_url="login_user")
+@user_passes_test(is_owner_or_receptionist, login_url="index")
+def update_appointment(request, appointment_id):
+
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    
+    form = AppointmentForm(request.POST or None, instance=appointment)
+    if request.method == "POST":
+
+        if not form.is_valid():
+            print(form.cleaned_data)
+            messages.warning(request, "Nie udało się aktualizować spotkania!!")
+            return redirect("update_appointment", appointment_id=appointment_id)
+        form.save(commit=False)
+        appointment.role = User.objects.get(id=form.cleaned_data.get("employee")).type
+        form.save()
+        messages.success(request, "Zmieniono termin wizyty")
+        return redirect("schedule")
+    
+    context = {
+        "form": form,
+        "appointment": appointment,
+    }
+
+    return render(request, "update_appointment.html", context)
+def service_list(request):
+    list_services = Service.objects.all().order_by('service_name')
+    grouped_services = {}
+    for service in list_services:
+        grouped_services[service.service_name] = {
+            'name': service.service_name,
+            'price': service.price,
+            'description': service.description,
+            'image': service.image,
+            'service_status': service.service_status
+        }
+
+    if request.method == 'POST':
+        service_name = request.POST.get('service_name')
+        service = Service.objects.get(code=service_name)
+        service.service_status = not service.service_status 
+        service.save() 
+           
+    context = {'grouped_services': grouped_services.values()}
+    return render(request, 'services.html', context)
+
+def change_service_status(request, service_name):
+    service = Service.objects.get(service_name=service_name)
+    service.service_status = not service.service_status
+    service.save()
+    return redirect('services')

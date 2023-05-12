@@ -1,8 +1,107 @@
-import re
 from datetime import timedelta, date
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import User, Product, ProductDelivery, Storage, Appointment, Client
+
+
+class ProductModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.code = '123'
+        cls.name = 'Product'
+        cls.price = 123
+        cls.expiry_duration = timedelta(days=123)
+        cls.test_product = Product.objects.create(
+            code=cls.code,
+            name=cls.name,
+            price=cls.price,
+            expiry_duration=cls.expiry_duration,
+        )
+
+    def tearDown(self):
+        self.product.delete()
+        self.test_product.delete()
+
+    def setUp(self):
+        self.product = Product.objects.get(code='123')
+
+    def test_product_fields(self):
+        self.assertEqual(self.product.code, self.code)
+        self.assertEqual(self.product.name, self.name)
+        self.assertEqual(self.product.price, self.price)
+        self.assertEqual(self.product.expiry_duration, self.expiry_duration)
+        self.assertEqual(self.product.deficit_status, False)
+
+    def test_max_values(self):
+        code_max_length = self.product._meta.get_field('code').max_length
+        name_max_length = self.product._meta.get_field('name').max_length
+        self.assertEqual(code_max_length, 50)
+        self.assertEqual(name_max_length, 100)
+
+
+class ProductDeliveryModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_product = Product.objects.create(
+            code='123',
+            name='Product',
+            price=123,
+            expiry_duration=timedelta(days=123),
+        )
+        cls.name = 'Product'
+        cls.amount = 123
+        cls.date = date.today()
+
+        cls.test_delivery = ProductDelivery.objects.create(
+            name=cls.name,
+            amount=cls.amount,
+            date=cls.date,
+        )
+
+    def tearDown(self) -> None:
+        self.test_product.delete()
+        self.test_delivery.delete()
+
+    def setUp(self) -> None:
+        self.delivery = ProductDelivery.objects.get(name=self.name)
+
+    def test_delivery_fields(self):
+        self.assertEqual(self.delivery.name, self.name)
+        self.assertEqual(self.delivery.amount, self.amount)
+        self.assertEqual(self.delivery.date, self.date)
+
+    def test_max_values(self):
+        name_max_length = self.delivery._meta.get_field('name').max_length
+        self.assertEqual(name_max_length, 100)
+
+
+class StorageModelTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_product = Product.objects.create(
+            code='123',
+            name='Product',
+            price=123,
+            expiry_duration=timedelta(days=123),
+        )
+
+        cls.test_delivery = ProductDelivery.objects.create(
+            name='Product',
+            amount=123,
+            date=date.today(),
+        )
+
+    def tearDown(self) -> None:
+        self.test_product.delete()
+        self.test_delivery.delete()
+
+    def setUp(self) -> None:
+        self.storage = Storage.objects.get(product=self.test_product.code)
+
+    def test_storage_fields(self):
+        self.assertEqual(self.storage.product, self.test_product)
+        self.assertEqual(self.storage.delivery, self.test_delivery)
+
 
 class HomePageTestCase(TestCase):
     def test_home_page_status_code(self):
@@ -31,7 +130,8 @@ class OwnerPageTestCase(TestCase):
     def setUp(self):
         self.username = 'testuser'
         self.password = 'testpass'
-        self.user = User.objects.create_user(username=self.username, password=self.password, first_name='test', last_name='test', email='kapit2000@gmail.com')
+        self.user = User.objects.create_user(username=self.username, password=self.password, first_name='test',
+                                             last_name='test', email='kapit2000@gmail.com')
 
     def test_owner_page_status_code(self):
         url = reverse('owner_page')

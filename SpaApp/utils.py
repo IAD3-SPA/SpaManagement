@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple, Union
-from datetime import timedelta, date
+from datetime import timedelta, date, time, timezone, datetime
 
 from django.contrib.auth import get_user_model
 
@@ -27,6 +27,14 @@ def create_new_user(form):
             password=form.cleaned_data.get("password1")
         )
     if form.cleaned_data.get("type") == User.Types.SUPPLIER:
+        return Supplier.objects.create_user(
+            username=form.cleaned_data.get("username"),
+            first_name=form.cleaned_data.get("first_name"),
+            last_name=form.cleaned_data.get("last_name"),
+            email=form.cleaned_data.get("email"),
+            password=form.cleaned_data.get("password1")
+        )
+    if form.cleaned_data.get("type") == User.Types.COSMETHOLOGIST:
         return Supplier.objects.create_user(
             username=form.cleaned_data.get("username"),
             first_name=form.cleaned_data.get("first_name"),
@@ -163,3 +171,20 @@ def _order_product_by_name(defifit_booelan) -> Dict[str, any]:
                     'delivery_id': product.delivery_id
             }
     return grouped_products
+
+class FormsAttr:
+    """Class for forms widgets"""
+    @staticmethod
+    def forms_attrs(placeholder: Union[str, None]) -> dict[str: Union[str, None]]: 
+        return {
+            "class": "form-control my-3",
+            "placeholder": placeholder,
+        }
+
+def get_next_hour() -> time:
+    """Check current hour and return """
+    ti = datetime.now(timezone(timedelta(hours=1))) + timedelta(minutes=30)
+    ti = ti.hour + 1 if ti.hour == datetime.now().hour else ti.hour + 2
+    if ti >= 24: ti = 0
+    return time(ti, 0).strftime("%H:%M")
+

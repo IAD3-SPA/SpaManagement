@@ -3,8 +3,29 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-<h1 class="center">
-    Services
-</h1>
-
+<div class="container">
+    <h1><strong>Services List</strong></h1>
+    <div class="row">
+      {% for service in grouped_services %}
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow {% if not service.service_status %}bg-danger text-white{% endif %}">
+            <img class="card-img-top" src="{{ service.image.url }}" alt="{{ service.image.url }}">
+            <div class="card-body">
+              <h4 class="card-title" font-weight-bold><strong>{{ service.name }}</strong></h4>
+              <p class="card-text">Description:</p>
+              <p class="card-text">{{ service.description }}</p>
+                <h3 class="{% if not service.service_status %}text-muted font-weight-bold{% endif %}">Price: {{ service.price }}</h3>
+                <form action="{% url 'change_service_status' service.name %}" method="POST">
+                  {% csrf_token %}
+                  {% if not service.service_status %}
+                  <h3 class="font-weight-bold">Service temporary unreachable!</h3>
+                  {% endif %}
+                  <input type="submit" value="Change Service Status">
+                </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock content %}
