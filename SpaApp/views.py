@@ -124,12 +124,16 @@ def login_user(request):
         if user is not None:
             login(request, user)
             if is_owner(user):
+                messages.success(request, "Zalogowałeś się jako właściciel:)")
                 return render(request, 'owner_page.html')
             elif is_accountant(user):
+                messages.success(request, "Zalogowałeś się jako księgowy :)")
                 return render(request, 'accountant_page.html')
             elif is_receptionist(user):
+                messages.success(request, "Zalogowałeś się jako recepcjonista :)")
                 return render(request, 'receptionist_page.html')
             elif is_supplier(user):
+                messages.success(request, "Zalogowałeś się jako dostawca :)")
                 return render(request, 'delivery_page.html')
             return render(request, 'index.html')
         messages.error(request, "Nie udało się zalogować")
@@ -144,6 +148,7 @@ def login_user(request):
 @login_required(login_url="login_user")
 def logout_user(request):
     logout(request)
+    messages.success(request, "Wylogowano pomyślnie")
     return redirect("index")
 
 
@@ -211,7 +216,7 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        # messages success
+        messages.success(request, "Aktywowano konto")
         return redirect("login_user")
 
     # error
