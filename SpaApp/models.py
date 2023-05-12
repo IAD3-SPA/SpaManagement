@@ -12,20 +12,18 @@ class ProductDelivery(models.Model):
     amount = models.IntegerField()
     date = models.DateField()
 
-    # We could add Delivery Man ID or Name
-
     def __str__(self):
         return f"{self.name}_{self.delivery_id}: {self.date}"
 
     def save(self, *args, **kwargs):
         try:
             product = Product.objects.get(name=self.name)
-        except Product.DoesNotExist:
-            raise ValueError(f"{self.name} product does not exist")
-            
+        except Product.DoesNotExist as exc:
+            raise ValueError(f"{self.name} product does not exist") from exc
+
         super().save(*args, **kwargs)
 
-        try: 
+        try:
             Storage.objects.create(product=product, delivery=self)
         except IntegrityError:
             Storage.objects.get(product=product, delivery=self).delete()
@@ -43,7 +41,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class Storage(models.Model):
     """Storage Model stores current quantity"""
@@ -65,6 +63,7 @@ class Storage(models.Model):
 
 class _Manager(BaseUserManager):
     """Parent manager class"""
+
     def create_user(self, username, first_name, last_name, password, email, is_active=False, **extra_fields):
         if not email:
             raise ValueError("Email must be given!")
@@ -121,6 +120,7 @@ class SupplierManager(_Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Types.SUPPLIER)
 
+
 class CosmethologistManager(_Manager):
     def get_queryset(self, *args, **kwargs):
         return super().get_queryset(*args, **kwargs).filter(type=User.Types.COSMETHOLOGIST)
@@ -130,11 +130,12 @@ class User(AbstractUser):
     objects = UserManager()
 
     """Custom User model"""
+
     class Types(models.TextChoices):
         OWNER = "OWNER", "owner"
         RECEPTIONIST = "RECEPTIONIST", "receptionist"
         ACCOUNTANT = "ACCOUNTANT", "accountant"
-        SUPPLIER = "SUPPLIER", "supplier"  
+        SUPPLIER = "SUPPLIER", "supplier"
         COSMETHOLOGIST = "COSMETHOLOGIST", "cosmethologist"
 
     type = models.CharField(
@@ -200,11 +201,12 @@ class Supplier(User):
         if not self.pk:
             self.type = User.Types.SUPPLIER
         return super().save(*args, **kwargs)
-    
+
+
 class Cosmethologist(User):
     objects = CosmethologistManager()
     base_type = User.Types.COSMETHOLOGIST
-    
+
     class Meta:
         proxy = True
 
@@ -214,9 +216,9 @@ class Cosmethologist(User):
         return super().save(*args, **kwargs)
 
 
-class Client(models.Model): 
-    name = models.CharField(max_length=255, null=True, blank=True) 
-    surname = models.CharField(max_length=255, null=True, blank=True) 
+class Client(models.Model):
+    name = models.CharField(max_length=255, null=True, blank=True)
+    surname = models.CharField(max_length=255, null=True, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
@@ -224,7 +226,6 @@ class Client(models.Model):
 
 
 class Appointment(models.Model):
-    
     class Types(models.TextChoices):
         OWNER = "OWNER", "Owner"
         RECEPTIONIST = "RECEPTIONIST", "Receptionist"
@@ -245,10 +246,9 @@ class Appointment(models.Model):
     )
     employee = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
 
-
     def __str__(self):
         return self.name
-    
+
 
 class Service(models.Model):
     """We have our own database of services we have"""
@@ -261,6 +261,3 @@ class Service(models.Model):
 
     def __str__(self):
         return self.service_name
-
-    
-
