@@ -16,6 +16,14 @@ jobs:
         run: |
           docker-compose up -d
           
+      - name: Create missing migration files
+        run: |
+          docker exec spamanagement_web_1 python manage.py makemigrations
+      
+      - name: Make migrations before tests
+        run: |
+          docker exec spamanagement_web_1 python manage.py migrate
+          
       - name: Run Django tests inside container
         run: |
           docker exec spamanagement_web_1 python manage.py test
