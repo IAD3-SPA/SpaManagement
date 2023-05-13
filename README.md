@@ -124,6 +124,7 @@ If you get the following error:
 ValueError: The field admin.LogEntry.user was declared with a lazy reference to 'SpaApp.user', but app 'SpaApp' doesn't provide model 'user'.
 ```
 Go to `settings.py` and in `INSTALLED_APPS` list comment the line with `'django.contrib.admin'`, so the list should look like:
+
 ```python
 INSTALLED_APPS = [
     # 'django.contrib.admin',

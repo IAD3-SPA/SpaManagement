@@ -1,23 +1,25 @@
-from datetime import datetime,date
+from datetime import datetime
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import ProductDelivery, Client, Appointment
 from django.forms import DateInput
 from .models import Client
 
 from betterforms.multiform import MultiModelForm
-from .utils import FormsAttr, get_next_hour
 
-user = get_user_model()
+from .utils import forms_attrs, get_next_hour
+from .models import ProductDelivery, Client, Appointment
+
+
+user_model = get_user_model()
 
 
 class NewEmployeeForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     class Meta:
-        model = user
+        model = user_model
         fields = ("first_name", "last_name", "username", "email", "password1", "password2", "type")
 
     def __init__(self, *args, **kwargs):
@@ -38,7 +40,7 @@ class NewEmployeeForm(UserCreationForm):
         }
 
     def save(self, commit=True):
-        user = super(NewEmployeeForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
         if commit:
             user.save()
@@ -50,7 +52,7 @@ class LoginForm(forms.Form, NewEmployeeForm):
     password = forms.CharField(max_length=65, widget=forms.PasswordInput)
 
     def __init__(self, *args, **kwargs):
-        super(LoginForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs.update(self.forms_attrs("Email"))
         self.fields["password"].widget.attrs.update(self.forms_attrs("Password"))
 
@@ -99,8 +101,9 @@ class ClientForm(forms.ModelForm):
 
 def _get_employee_list() -> list[tuple[int, str]]:
     """return list of emplyee"""
-    users = user.objects.all()
+    users = user_model.objects.all()
     return [(user.id, user.username) for user in users]
+
 
 class AppointmentForm(forms.ModelForm):
     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
@@ -110,18 +113,17 @@ class AppointmentForm(forms.ModelForm):
     employee = forms.ChoiceField(choices=_get_employee_list(),
                                  widget=forms.Select(attrs={'class': 'form-control'}))
 
-
     class Meta:
         model = Appointment
         fields = ["name", "description", "date", "time"]
 
     def __init__(self, *args, **kwargs):
-        super(AppointmentForm, self).__init__(*args, **kwargs)
-        self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Nazwa"))
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(forms_attrs("Nazwa"))
         self.fields["description"].widget.attrs.update(
-            FormsAttr.forms_attrs("Informacje dodatkowe"))
-        self.fields["date"].widget.attrs.update(FormsAttr.forms_attrs("Data"))
-        self.fields["time"].widget.attrs.update(FormsAttr.forms_attrs("Godzina"))
+            forms_attrs("Informacje dodatkowe"))
+        self.fields["date"].widget.attrs.update(forms_attrs("Data"))
+        self.fields["time"].widget.attrs.update(forms_attrs("Godzina"))
         self.initial["time"] = get_next_hour()
 
     def clean(self):
@@ -132,6 +134,18 @@ class AppointmentForm(forms.ModelForm):
             if date < date.today() or time < datetime.now().time():
                 raise forms.ValidationError("Podana data jest przeszła.")
         return cleaned_data
+
+
+class ClientForms(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ["name", "surname", "phone_number"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(forms_attrs("Imie"))
+        self.fields["surname"].widget.attrs.update(forms_attrs("Nazwisko"))
+        self.fields["phone_number"].widget.attrs.update(forms_attrs("+48..."))
 
 
 class AppointmentClientForm(MultiModelForm):

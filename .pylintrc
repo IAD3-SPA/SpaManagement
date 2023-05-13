@@ -3,3 +3,7 @@ load-plugins=pylint_django
 django-settings-module=SpaManagement.settings
 fail-under=8
 ignore=SpaApp/migrations
+disable=missing-docstring,too-many-ancestors,too-many-arguments,imported-auth-user
+
+[FORMAT]
+max-line-length=120

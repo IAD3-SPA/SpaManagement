@@ -230,8 +230,10 @@ class StorageAlertTestCase(TestCase):
 class ScheduleViewTestCase(TestCase):
     def setUp(self):
         self.client1 = Client.objects.create(name='John', surname='Doe', phone_number='123456789')
-        self.appointment1 = Appointment.objects.create(name='Meeting', date='2023-04-23', time='14:00', client=self.client1)
-        
+        self.appointment1 = Appointment.objects.create(name='Meeting',
+                                                       date='2023-04-23',
+                                                       time='14:00',
+                                                       client=self.client1)
 
     def test_schedule_view(self):
         url = reverse('schedule')
@@ -239,12 +241,13 @@ class ScheduleViewTestCase(TestCase):
         self.assertContains(response, self.appointment1.client.name)
         self.assertContains(response, '<td>April 23, 2023</td>')
         self.assertContains(response, '<td>2 p.m.</td>')
-        
+
 
 class AppointmentTemplateTest(TestCase):
     def setUp(self):
         self.client1 = Client.objects.create(name='John', surname='Doe', phone_number='123456789')
-        self.appointment1 = Appointment.objects.create(name='Meeting', description='Discuss new project', date='2023-04-23', time='14:00', client=self.client1)
+        self.appointment1 = Appointment.objects.create(name='Meeting', description='Discuss new project',
+                                                       date='2023-04-23', time='14:00', client=self.client1)
 
     def test_appointment_template(self):
         url = reverse('appointment', args=[self.appointment1.id])
