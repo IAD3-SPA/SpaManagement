@@ -136,18 +136,6 @@ class AppointmentForm(forms.ModelForm):
         return cleaned_data
 
 
-class ClientForms(forms.ModelForm):
-    class Meta:
-        model = Client
-        fields = ["name", "surname", "phone_number"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["name"].widget.attrs.update(forms_attrs("Imie"))
-        self.fields["surname"].widget.attrs.update(forms_attrs("Nazwisko"))
-        self.fields["phone_number"].widget.attrs.update(forms_attrs("+48..."))
-
-
 class AppointmentClientForm(MultiModelForm):
     form_classes = {
         "client": ClientForm,
