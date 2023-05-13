@@ -1,15 +1,17 @@
-from django.shortcuts import HttpResponse, render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate, get_user_model
+import datetime
+
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-from django.conf import settings
+from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
-import datetime
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
 
 
 
@@ -200,28 +202,31 @@ def delete_product(request, product_name, delivery_id):
 
 def refund_product(request, product_name, client_id, order_id):
     product_delivery = ProductDelivery.objects.get(name=product_name)
-    product_z = Product.objects.get(name=product_name)
+    chosen_product = Product.objects.get(name=product_name)
     client = Client.objects.get(pk=client_id)
-    orders2 = Order.objects.filter(client=client)
-    orders3 = orders2.get(id=order_id)
-    client.benefits_program -= product_z.price
+    client_orders = Order.objects.filter(client=client)
+    single_order = client_orders.get(id=order_id)
+    client.benefits_program -=  chosen_product.price
     product_delivery.amount += 1
     product_delivery.save()
-    orders3.refunded = True
-    orders3.save()
+    single_order.refunded = True
+    single_order.save()
     return redirect('client_page', client_id=client.pk)
 
 def sell_product(request, product_name, delivery_id):
     product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
-    product_z = Product.objects.get(name=product_name)
+    chosen_product = Product.objects.get(name=product_name)
     if request.method == 'POST':
         client_id = request.POST.get('client')
         if client_id:
             client = Client.objects.get(pk=client_id)
-            order = Order.objects.create(product=product_z, client=client, date=datetime.date.today())
+            order = Order.objects.create(product=chosen_product, client=client, date=datetime.date.today())
             product_delivery.amount -= 1
             product_delivery.save()
             return redirect('client_page', client_id=client.pk)
+    else:
+        return redirect('products_store_page')   
+    
 
 
 

@@ -119,17 +119,6 @@ class AppointmentForm(forms.ModelForm):
                 raise forms.ValidationError("Podana data jest przeszła.")
         return cleaned_data
 
-'''
-class ClientForm(forms.ModelForm):
-    class Meta:
-        model = Client
-        fields = ["name", "surname", "phone_number"]
-    def __init__(self, *args, **kwargs):
-        super(ClientForm, self).__init__(*args, **kwargs)
-        self.fields["name"].widget.attrs.update(FormsAttr.forms_attrs("Imie"))
-        self.fields["surname"].widget.attrs.update(FormsAttr.forms_attrs("Nazwisko"))
-        self.fields["phone_number"].widget.attrs.update(FormsAttr.forms_attrs("+48..."))
-'''
 
 class AppointmentClientForm(MultiModelForm):
     form_classes = {
