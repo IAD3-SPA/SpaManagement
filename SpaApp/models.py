@@ -232,6 +232,7 @@ class Client(models.Model):
         self.save()
 
 
+
 class Appointment(models.Model):
     
     class Types(models.TextChoices):

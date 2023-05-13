@@ -19,7 +19,7 @@ from .utils import create_new_user, is_accountant, is_owner, is_owner_or_account
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
 from .tokens import account_activation_token
 from .models import ProductDelivery, Product, Client, Order,  Service, Appointment
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, AppointmentClientForm, AppointmentForm
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, ClientForm2, AppointmentClientForm, AppointmentForm
 
 
 
@@ -273,12 +273,12 @@ def appointment(request, pk):
 
 def client_register(request):
     if request.method == 'POST':
-        form = ClientForm(request.POST)
+        form = ClientForm2(request.POST)
         if form.is_valid():
             client = form.save()
             return redirect(reverse('client_page', args=[client.id]))
     else:
-        form = ClientForm()
+        form = ClientForm2()
     return render(request, 'client_register.html', {'form': form})
 
 
