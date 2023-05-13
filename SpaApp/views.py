@@ -16,11 +16,14 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
-    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, create_warning_message, _order_product_by_name
+    is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, \
+    create_warning_message, order_product_by_name
 from .tokens import account_activation_token
 from .models import ProductDelivery, Product, Client, Order,  Service, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, AppointmentClientForm, AppointmentForm
 
+
+User = get_user_model()
 
 
 def send_registration_mail(request, user, email_to_send):
@@ -42,9 +45,6 @@ def send_registration_mail(request, user, email_to_send):
     email.send()
 
 
-User = get_user_model()
-
-
 def index(request):
     return render(request, "index.html")
 
@@ -58,7 +58,14 @@ def products(request):
 
 
 def schedule(request):
-    return render(request, "schedule.html")
+    # FIXME: Czemu byly dwie funkcje schedule
+    role = request.user.type  # assuming that the user's role is stored in the 'type' field
+    if role == 'OWNER':
+        appointments = Appointment.objects.all()
+    else:
+        appointments = Appointment.objects.filter(role=role)
+
+    return render(request, 'schedule.html', {'appointments': appointments})
 
 
 @login_required(login_url="login_user")
@@ -71,7 +78,23 @@ def owner_page(request):
 @login_required(login_url="login_user")
 @user_passes_test(is_owner_or_supplier, login_url="index")
 def delivery_page(request):
-    return render(request, "delivery_page.html")
+    # FIXME: Czemy byly zdefiniowane dwie funkcjie delivery_page
+    if request.method == 'POST':
+        form = ProductDeliveryForm(request.POST)
+        if form.is_valid():
+            try:
+                delivery_product = form.save()
+                messages.success(request, f"Dodałeś {delivery_product.name} w ilości {delivery_product.amount}"
+                                          f"do naszej bazy produktów!")
+
+            except ValueError:
+                messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
+            return redirect("delivery_page")
+        messages.error(request, "Nie udało się dodać produktów")
+    else:
+        form = ProductDeliveryForm()
+    context = {"form": form}
+    return render(request, 'delivery_page.html', context)
 
 
 @login_required(login_url="login_user")
@@ -91,17 +114,18 @@ def contact(request):
 
 
 # widok do usunięcia
-def help(request):
+def help_view(request):
     text = """
     Naszym głównym katalogiem jest katalog SpaApp: <br>
-    - w pliku urls.py dodajemy kolejne strony w naszej aplikacji według schematu: path('<scieżka url>', views.<nazwa funkcji>, 
-                    i nazwa - proponuje nazywac od nazwy funkcji) <br>
-    - plik views.py jest plikiem na widoki podstron, w nim tworzymy funkcjie (lub klasy) odpowiadające jednej stronie w naszej aplikacji,
-                    na koniec zwracamy naszą strone. Do zwracania plikow HTML służy render - w pliku views jest przykład /html <br>
-    - plik models.py przechowuje modele bazy danych, jedna klasa odpowiada jednej tabeli w bazie danych, jest tam przykładowa klasa i 
-                    jeśli chcemy dodać ją do bazy danych musimy zrobić migracje (jak w Laravel)<br>
-    - html dodajemy do katalogu templates, css do static/css, js do static/js, żeby style zadziałały na stronie trzeba je załadować tak jak w przykładzie
-    i to chyba tyle
+    - w pliku urls.py dodajemy kolejne strony w naszej aplikacji według schematu: path('<scieżka url>',
+     views.<nazwa funkcji>, i nazwa - proponuje nazywac od nazwy funkcji) <br>
+    - plik views.py jest plikiem na widoki podstron, w nim tworzymy funkcjie (lub klasy) odpowiadające jednej stronie
+    w naszej aplikacji, na koniec zwracamy naszą strone.
+    Do zwracania plikow HTML służy render - w pliku views jest przykład /html <br>
+    - plik models.py przechowuje modele bazy danych, jedna klasa odpowiada jednej tabeli w bazie danych,
+     jest tam przykładowa klasa i jeśli chcemy dodać ją do bazy danych musimy zrobić migracje (jak w Laravel)<br>
+    - html dodajemy do katalogu templates, css do static/css, js do static/js,
+     żeby style zadziałały na stronie trzeba je załadować tak jak w przykładzie i to chyba tyle
     """
 
     return HttpResponse(text)
@@ -132,15 +156,13 @@ def login_user(request):
             login(request, user)
             if is_owner(user):
                 return render(request, 'owner_page.html')
-            elif is_accountant(user):
+            if is_accountant(user):
                 return render(request, 'accountant_page.html')
-            elif is_receptionist(user):
+            if is_receptionist(user):
                 return render(request, 'receptionist_page.html')
-            elif is_supplier(user):
+            if is_supplier(user):
                 return render(request, 'delivery_page.html')
             return render(request, 'index.html')
-        messages.error(request, "Nie udało się zalogować")
-        return redirect("login_user")
 
     form = LoginForm()
     clients = Client.objects.all()
@@ -154,41 +176,20 @@ def logout_user(request):
     return redirect("index")
 
 
-def delivery_page(request):
-    if request.method == 'POST':
-        form = ProductDeliveryForm(request.POST)
-        if form.is_valid():
-            try:
-                delivery_product = form.save()
-                messages.success(request,
-                                 "Dodałeś {} w ilości {} do naszej bazy produktów!".format(delivery_product.name,
-                                                                                           delivery_product.amount))
-            except ValueError as e:
-                messages.error(request, "Nie udało się dodać produktów. Nie oferujemy takiego produktu!")
-            return redirect("delivery_page")
-        messages.error(request, "Nie udało się dodać produktów")
-    else:
-        form = ProductDeliveryForm()
-    context = {"form": form}
-    return render(request, 'delivery_page.html', context)
-
-
-
-
 def product_list(request):
-    grouped_products = _order_product_by_name(True)
+    grouped_products = order_product_by_name(True)
     if request.method == 'POST':
         product_name = request.POST.get('product_name')
         product = Product.objects.get(code=product_name)
-        product.deficit_status = not product.deficit_status 
-        product.save() 
-           
+        product.deficit_status = not product.deficit_status
+        product.save()
+
     context = {'grouped_products': grouped_products.values()}
     return render(request, 'product_list.html', context)
 
 
 def products_store_page(request):
-    grouped_products = _order_product_by_name(False)
+    grouped_products = order_product_by_name(False)
     clients = Client.objects.all()
     context = {'grouped_products': grouped_products.values(), 'clients': clients}
     return render(request, 'products_store_page.html', context)
@@ -238,37 +239,28 @@ def change_deficit_status(request, product_name):
 
 
 def activate(request, uidb64, token):
-    User = get_user_model()
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-    except:
+
+    except ObjectDoesNotExist:
         user = None
-    print(user)
+
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        # messages success
         return redirect("login_user")
 
     # error
     return redirect("index")
 
-def schedule(request):
-    role = request.user.type  # assuming that the user's role is stored in the 'type' field
-    if role == 'OWNER':
-        appointments = Appointment.objects.all()
-    else:
-        appointments = Appointment.objects.filter(role=role)
 
-    return render(request, 'schedule.html', {'appointments': appointments})
-
-def appointment(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
+def appointment(request, primary_key):
+    appointment_object = get_object_or_404(Appointment, pk=primary_key)
     if request.method == "POST":
-        appointment.delete()
+        appointment_object.delete()
         return redirect("schedule")
-    return render(request, 'appointment.html', {'appointment': appointment})
+    return render(request, 'appointment.html', {'appointment': appointment_object})
 
 
 def client_register(request):
@@ -290,13 +282,13 @@ def client_list(request):
 def client_page(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     orders = Order.objects.filter(client=client)
-    grouped_products = _order_product_by_name(False)
+    grouped_products = order_product_by_name(False)
     context = {'grouped_products': grouped_products.values(), 'client': client, 'orders' : orders}
     return render(request, 'client_page.html', context)
 
 def loyal_page(request, client_id):
     client = get_object_or_404(Client, id=client_id)
-    grouped_products = _order_product_by_name(False)
+    grouped_products = order_product_by_name(False)
     context = {'grouped_products': grouped_products.values(), 'client': client,}
     return render(request, 'loyal_page.html', context)
 
@@ -309,38 +301,36 @@ def go_to_client(request):
 @login_required(login_url="login_user")
 @user_passes_test(is_owner_or_receptionist, login_url="index")
 def new_appointment(request):
-
     if request.method == "POST":
         form = AppointmentClientForm(request.POST)
         if not form.is_valid():
             messages.warning(request, "Data spotania nie może być wcześniejsza niż pół godziny od teraz.")
             return redirect("new_appointment")
-        appointment = form["appointment"].save(commit=False)
-        appointment.employee = User.objects.get(id=form["appointment"].cleaned_data.get("employee"))
+        appointment_object = form["appointment"].save(commit=False)
+        appointment_object.employee = User.objects.get(id=form["appointment"].cleaned_data.get("employee"))
         if not None in form["client"].cleaned_data.values():
             client = form["client"].save()
-            appointment.client = client
-        print(appointment.employee.type)
-        appointment.role = appointment.employee.type
-        appointment.save()
+            appointment_object.client = client
+        print(appointment_object.employee.type)
+        appointment_object.role = appointment_object.employee.type
+        appointment_object.save()
         messages.success(request, "Dodano nowe spotkanie")
         if is_receptionist(request.user):
-            return redirect("receptionist_page") 
-        elif is_owner(request.user):
+            return redirect("receptionist_page")
+        if is_owner(request.user):
             return redirect("owner_page")
-        else:
-            return HttpResponseNotFound("Kim jesteś?")
+        return HttpResponseNotFound("Kim jesteś?")
     form = AppointmentClientForm()
     context = {"form": form}
     return render(request, 'new_appointment.html', context)
 
+
 @login_required(login_url="login_user")
 @user_passes_test(is_owner_or_receptionist, login_url="index")
 def update_appointment(request, appointment_id):
+    appointment_object = get_object_or_404(Appointment, pk=appointment_id)
 
-    appointment = get_object_or_404(Appointment, pk=appointment_id)
-    
-    form = AppointmentForm(request.POST or None, instance=appointment)
+    form = AppointmentForm(request.POST or None, instance=appointment_object)
     if request.method == "POST":
 
         if not form.is_valid():
@@ -348,17 +338,19 @@ def update_appointment(request, appointment_id):
             messages.warning(request, "Nie udało się aktualizować spotkania!!")
             return redirect("update_appointment", appointment_id=appointment_id)
         form.save(commit=False)
-        appointment.role = User.objects.get(id=form.cleaned_data.get("employee")).type
+        appointment_object.role = User.objects.get(id=form.cleaned_data.get("employee")).type
         form.save()
         messages.success(request, "Zmieniono termin wizyty")
         return redirect("schedule")
-    
+
     context = {
         "form": form,
-        "appointment": appointment,
+        "appointment": appointment_object,
     }
 
     return render(request, "update_appointment.html", context)
+
+
 def service_list(request):
     list_services = Service.objects.all().order_by('service_name')
     grouped_services = {}
@@ -374,11 +366,12 @@ def service_list(request):
     if request.method == 'POST':
         service_name = request.POST.get('service_name')
         service = Service.objects.get(code=service_name)
-        service.service_status = not service.service_status 
-        service.save() 
-           
+        service.service_status = not service.service_status
+        service.save()
+
     context = {'grouped_services': grouped_services.values()}
     return render(request, 'services.html', context)
+
 
 def change_service_status(request, service_name):
     service = Service.objects.get(service_name=service_name)

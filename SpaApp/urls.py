@@ -7,9 +7,9 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('services/', views.service_list, name='services'),
     path('contact/', views.contact, name='contact'),
-    path('products/', views.products, name='products'),    
+    path('products/', views.products, name='products'),
     path('receptionist_page/', views.receptionist_page, name='receptionist_page'),
-    path('owner_page/', views.owner_page, name='owner_page'),           
+    path('owner_page/', views.owner_page, name='owner_page'),
     path('delivery_page/', views.delivery_page, name='delivery_page'),
     path('accountant_page/', views.accountant_page, name='accountant_page'),
     path('register/', views.register, name="register"),
@@ -22,7 +22,7 @@ urlpatterns = [
     path('sell_product/<str:product_name>/<int:delivery_id>/', views.sell_product, name='sell_product'),
     path('refund_product/<str:product_name>/<int:client_id>/<int:order_id>', views.refund_product, name='refund_product'),
     path('change_service_status/<str:service_name>/', views.change_service_status, name='change_service_status'),
-    path('help/', views.help, name='help'),
+    path('help/', views.help_view, name='help'),
     path('schedule/', views.schedule, name="schedule"),
     path('activate/<uidb64>/<token>', views.activate, name="activate"),
     path('appointment/<int:pk>/', views.appointment, name='appointment'),
@@ -32,6 +32,4 @@ urlpatterns = [
     path('login/<int:client_id>/loyal/', views.loyal_page, name='loyal_page'),
     path('new_appointment/', views.new_appointment, name='new_appointment'),
     path('update_appointment/<int:appointment_id>', views.update_appointment, name='update_appointment'),
-    
- 
 ]
