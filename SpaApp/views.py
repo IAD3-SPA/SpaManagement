@@ -154,16 +154,6 @@ def login_user(request):
         
         if user is not None:
             login(request, user)
-            '''
-            if is_owner(user):
-                return render(request, 'owner_page.html')
-            if is_accountant(user):
-                return render(request, 'accountant_page.html')
-            if is_receptionist(user):
-                return render(request, 'receptionist_page.html')
-            if is_supplier(user):
-                return render(request, 'delivery_page.html')
-            '''
             if is_owner(user):
                 return redirect('owner_page')
             if is_accountant(user):
