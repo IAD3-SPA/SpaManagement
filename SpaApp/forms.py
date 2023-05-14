@@ -125,6 +125,7 @@ class AppointmentForm(forms.ModelForm):
         self.fields["date"].widget.attrs.update(forms_attrs("Data"))
         self.fields["time"].widget.attrs.update(forms_attrs("Godzina"))
         self.initial["time"] = get_next_hour()
+        self.fields['employee'].choices = _get_employee_list()
 
     def clean(self):
         cleaned_data = super().clean()
