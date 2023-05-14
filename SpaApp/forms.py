@@ -111,7 +111,7 @@ class AppointmentForm(forms.ModelForm):
     description = forms.CharField(widget=forms.Textarea, required=False)
 
     employee = forms.ChoiceField(choices=_get_employee_list(),
-                                 widget=forms.Select(attrs={'class': 'form-control'}))
+                              widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Appointment
