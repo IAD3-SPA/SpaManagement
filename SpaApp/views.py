@@ -17,7 +17,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, \
-    create_warning_message, order_product_by_name
+    create_warning_message, order_product_by_name, is_cosmethologist, is_owner_or_cosmethologist
 from .tokens import account_activation_token
 from .models import ProductDelivery, Product, Client, Order,  Service, Appointment
 from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, ClientForm2, AppointmentClientForm, AppointmentForm

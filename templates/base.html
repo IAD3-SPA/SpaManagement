@@ -42,9 +42,11 @@
             <a href="{% url 'logout_user' %}" class="btn btn-light" style="margin-right: 10px">
                 Wyloguj się
             </a>
-                    <a href="{% url 'register' %}" class="btn btn-light">
-                Dodaj pracownika
-            </a>
+            {% if request.user.type == "OWNER" %}
+                <a href="{% url 'register' %}" class="btn btn-light">
+                    Dodaj pracownika
+                </a>
+            {% endif %}
         {% else %}
             <a href="{% url 'login_user' %}" class="btn btn-light">
                 Zaloguj się
@@ -53,7 +55,20 @@
     </div>
 
 </nav>
-
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == "error" %}
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+        {% else %}
+            <div class="alert alert-{{message.tags}} d-flex align-items-center" role="alert">
+        {% endif %}
+        <svg class="bi flex-shrink-0 me-2" width="30" height="38" role="img"></svg>
+        <div class='text-center'>
+            {{message}}
+        </div>
+        </div>
+    {% endfor %}
+{% endif %}
 <div class="container-fluid" style="min-height: 500px;margin-bottom: 100px;clear: both;">
     {% block content %}
 
