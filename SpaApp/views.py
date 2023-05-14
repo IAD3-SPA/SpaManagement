@@ -280,8 +280,8 @@ def activate(request, uidb64, token):
     return redirect("index")
 
 
-def appointment(request, primary_key):
-    appointment_object = get_object_or_404(Appointment, pk=primary_key)
+def appointment(request, pk):
+    appointment_object = get_object_or_404(Appointment, pk=pk)
     if request.method == "POST":
         appointment_object.delete()
         return redirect("schedule")
