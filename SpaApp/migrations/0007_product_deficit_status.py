@@ -9,10 +9,10 @@ class Migration(migrations.Migration):
         ('SpaApp', '0006_deficit'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='product',
-            name='deficit_status',
-            field=models.BooleanField(default=False),
-        ),
-    ]
+    # operations = [
+    #     migrations.AddField(
+    #         model_name='product',
+    #         name='deficit_status',
+    #         field=models.BooleanField(default=False),
+    #     ),
+    # ]
