@@ -12,9 +12,6 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-
-
-
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, \
     create_warning_message, order_product_by_name, is_cosmethologist, is_owner_or_cosmethologist
@@ -406,3 +403,8 @@ def change_service_status(request, service_name):
     service.service_status = not service.service_status
     service.save()
     return redirect('services')
+
+
+def handler404(request, exception):
+    return render(request, '404.html', status=404)
+

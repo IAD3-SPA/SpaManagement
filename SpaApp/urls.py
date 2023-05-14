@@ -3,6 +3,9 @@ from django.urls import path
 from . import views
 
 
+handler404 = views.handler404
+
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('services/', views.service_list, name='services'),
@@ -31,4 +34,6 @@ urlpatterns = [
     path('login/<int:client_id>/loyal/', views.loyal_page, name='loyal_page'),
     path('new_appointment/', views.new_appointment, name='new_appointment'),
     path('update_appointment/<int:appointment_id>', views.update_appointment, name='update_appointment'),
-]
+    path('404/', views.handler404, name='handler404'),
+    ]
+
