@@ -154,6 +154,7 @@ def login_user(request):
         
         if user is not None:
             login(request, user)
+            '''
             if is_owner(user):
                 return render(request, 'owner_page.html')
             if is_accountant(user):
@@ -162,6 +163,16 @@ def login_user(request):
                 return render(request, 'receptionist_page.html')
             if is_supplier(user):
                 return render(request, 'delivery_page.html')
+            '''
+            if is_owner(user):
+                return redirect('owner_page')
+            if is_accountant(user):
+                return redirect('accountant_page')
+            if is_receptionist(user):
+                return redirect('receptionist_page')
+            if is_supplier(user):
+                return redirect('delivery_page')
+
             return render(request, 'index.html')
 
     form = LoginForm()
@@ -169,11 +180,35 @@ def login_user(request):
     context = {"form": form , 'clients': clients}
     return render(request, "templates/login.html", context)
 
+@login_required
+@user_passes_test(is_owner)
+def owner_page(request):
+    return render(request, 'owner_page.html')
+
+@login_required
+@user_passes_test(is_accountant)
+def accountant_page(request):
+    return render(request, 'accountant_page.html')
+
+@login_required
+@user_passes_test(is_receptionist)
+def receptionist_page(request):
+    return render(request, 'receptionist_page.html')
+
+@login_required
+@user_passes_test(is_supplier)
+def supplier_page(request):
+    return render(request, 'delivery_page.html')
+
+
+
 
 @login_required(login_url="login_user")
 def logout_user(request):
     logout(request)
     return redirect("index")
+
+
 
 
 def product_list(request):

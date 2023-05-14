@@ -1,4 +1,5 @@
 {% load static %}
+{% load SpaApp %}
 {% load django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="pl">
@@ -21,7 +22,18 @@
 
 
 <nav class="navbar navbar-expand-lg" style="background-color: #FFB6C1;">
+    {% if user|is_owner %}
+        <a class="navbar-brand text-dark" href="{% url 'owner_page' %}" >SPA</a>
+    {% elif user|is_accountant %}
+        <a class="navbar-brand text-dark" href="{% url 'accountant_page' %}" >SPA</a>
+    {% elif user|is_receptionist %}
+        <a class="navbar-brand text-dark" href="{% url 'receptionist_page' %}" >SPA</a>
+    {% elif user|is_supplier %}
+        <a class="navbar-brand text-dark" href="{% url 'delivery_page' %}" >SPA</a>
+    {% else %}
     <a class="navbar-brand text-dark" href="{% url 'index' %}" >SPA</a>
+    {% endif %}
+<a class="navbar-brand text-dark" href="{% url 'index' %}" >SPA</a>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
