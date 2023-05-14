@@ -15,6 +15,7 @@
               <p class="card-text">Description:</p>
               <p class="card-text">{{ service.description }}</p>
                 <h3 class="{% if not service.service_status %}text-muted font-weight-bold{% endif %}">Price: {{ service.price }}</h3>
+                {% if user.is_authenticated%}
                 <form action="{% url 'change_service_status' service.name %}" method="POST">
                   {% csrf_token %}
                   {% if not service.service_status %}
@@ -22,6 +23,7 @@
                   {% endif %}
                   <input type="submit" value="Change Service Status">
                 </form>
+                {% endif %}
             </div>
           </div>
         </div>
