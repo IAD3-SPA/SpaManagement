@@ -217,10 +217,10 @@ class Cosmethologist(User):
 
 
 class Client(models.Model): 
-    name = models.CharField(max_length=255) 
-    surname = models.CharField(max_length=255) 
-    phone_number = models.CharField(max_length=15)
-    benefits_program = models.FloatField(default=0.0)
+    name = models.CharField(max_length=255, null=True, blank=True) 
+    surname = models.CharField(max_length=255, null=True, blank=True) 
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    benefits_program = models.FloatField(default=0.0, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + self.surname

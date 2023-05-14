@@ -46,6 +46,9 @@ def is_accountant(user):
 def is_supplier(user):
     return user.type == User.Types.SUPPLIER
 
+def is_cosmethologist(user):
+    return user.type == User.Types.COSMETHOLOGIST
+
 
 def is_owner_or_receptionist(user):
     return is_owner(user) or is_receptionist(user)
@@ -58,6 +61,8 @@ def is_owner_or_accountant(user):
 def is_owner_or_supplier(user):
     return is_owner(user) or is_supplier(user)
 
+def is_owner_or_cosmethologist(user):
+    return is_owner(user) or is_cosmethologist(user)
 
 def create_warning_message() -> Union[str, None]:
     """Creates a full warning massage with bullet points of expired and soon to be expired products"""
