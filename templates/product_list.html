@@ -12,14 +12,16 @@
             <img class="card-img-top" src="{{ product.image.url }}">
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
+              {% if user.is_authenticated %}
                 <h3 class="{% if product.deficit %}text-muted font-weight-bold{% endif %}">Amount: {{ product.total_amount }}</h3>
-                <form action="{% url 'change_deficit_status' product.name %}" method="POST">
+                  <form action="{% url 'change_deficit_status' product.name %}" method="POST">
                   {% csrf_token %}
                   {% if product.deficit %}
                   <h3 class="font-weight-bold">Deficyt!</h3>
                   {% endif %}
                   <input type="submit" value="Change Deficit Status">
                 </form>
+                {% endif %}
             </div>
           </div>
         </div>
@@ -27,6 +29,4 @@
     </div>
   </div>
 {% endblock %}
-
-
 

@@ -46,7 +46,21 @@ def send_registration_mail(request, user, email_to_send):
 
 
 def index(request):
-    return render(request, "index.html")
+    user = request.user
+
+    if not user.is_authenticated:
+        return render(request, "index.html")
+
+    if is_owner(user):
+        return render(request, "owner_page.html")
+    elif is_supplier(user):
+        return render(request, "delivery_page.html")
+    elif is_accountant(user):
+        return render(request, "accountant_page.html")
+    elif is_receptionist(user):
+        return render(request, "receptionist_page.html")
+    else:
+        return render(request, "index.html")
 
 
 def services(request):
@@ -113,24 +127,6 @@ def contact(request):
     return render(request, "strona_kotaktowa.html")
 
 
-# widok do usunięcia
-def help_view(request):
-    text = """
-    Naszym głównym katalogiem jest katalog SpaApp: <br>
-    - w pliku urls.py dodajemy kolejne strony w naszej aplikacji według schematu: path('<scieżka url>',
-     views.<nazwa funkcji>, i nazwa - proponuje nazywac od nazwy funkcji) <br>
-    - plik views.py jest plikiem na widoki podstron, w nim tworzymy funkcjie (lub klasy) odpowiadające jednej stronie
-    w naszej aplikacji, na koniec zwracamy naszą strone.
-    Do zwracania plikow HTML służy render - w pliku views jest przykład /html <br>
-    - plik models.py przechowuje modele bazy danych, jedna klasa odpowiada jednej tabeli w bazie danych,
-     jest tam przykładowa klasa i jeśli chcemy dodać ją do bazy danych musimy zrobić migracje (jak w Laravel)<br>
-    - html dodajemy do katalogu templates, css do static/css, js do static/js,
-     żeby style zadziałały na stronie trzeba je załadować tak jak w przykładzie i to chyba tyle
-    """
-
-    return HttpResponse(text)
-
-
 def register(request):
     if request.method == "POST":
         form = NewEmployeeForm(request.POST)
@@ -170,20 +166,24 @@ def login_user(request):
     context = {"form": form , 'clients': clients}
     return render(request, "templates/login.html", context)
 
+
 @login_required
 @user_passes_test(is_owner)
 def owner_page(request):
     return render(request, 'owner_page.html')
+
 
 @login_required
 @user_passes_test(is_accountant)
 def accountant_page(request):
     return render(request, 'accountant_page.html')
 
+
 @login_required
 @user_passes_test(is_receptionist)
 def receptionist_page(request):
     return render(request, 'receptionist_page.html')
+
 
 @login_required
 @user_passes_test(is_supplier)
@@ -191,14 +191,10 @@ def supplier_page(request):
     return render(request, 'delivery_page.html')
 
 
-
-
 @login_required(login_url="login_user")
 def logout_user(request):
     logout(request)
     return redirect("index")
-
-
 
 
 def product_list(request):
@@ -213,6 +209,7 @@ def product_list(request):
     return render(request, 'product_list.html', context)
 
 
+@user_passes_test(is_owner_or_receptionist)
 def products_store_page(request):
     grouped_products = order_product_by_name(False)
     clients = Client.objects.all()
@@ -220,11 +217,13 @@ def products_store_page(request):
     return render(request, 'products_store_page.html', context)
 
 
+@user_passes_test(is_owner_or_receptionist)
 def delete_product(request, product_name, delivery_id):
     product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
     product_delivery.amount -= 1
     product_delivery.save()
     return redirect('products_store_page')
+
 
 def refund_product(request, product_name, client_id, order_id):
     product_delivery = ProductDelivery.objects.get(name=product_name)
@@ -239,6 +238,8 @@ def refund_product(request, product_name, client_id, order_id):
     single_order.save()
     return redirect('client_page', client_id=client.pk)
 
+
+@user_passes_test(is_owner_or_receptionist)
 def sell_product(request, product_name, delivery_id):
     product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
     chosen_product = Product.objects.get(name=product_name)
@@ -288,6 +289,7 @@ def appointment(request, primary_key):
     return render(request, 'appointment.html', {'appointment': appointment_object})
 
 
+@user_passes_test(is_owner)
 def client_register(request):
     if request.method == 'POST':
         form = ClientForm2(request.POST)
@@ -299,6 +301,7 @@ def client_register(request):
     return render(request, 'client_register.html', {'form': form})
 
 
+@user_passes_test(is_owner)
 def client_list(request):
     clients = Client.objects.all()
     return render(request, 'client_list.html', {'clients': clients})
