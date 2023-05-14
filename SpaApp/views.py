@@ -1,22 +1,27 @@
-from django.http import HttpResponseNotFound
-from django.shortcuts import HttpResponse, render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate, get_user_model
+import datetime
+
+from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
+from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
+
+
 
 from .utils import create_new_user, is_accountant, is_owner, is_owner_or_accountant, \
     is_owner_or_receptionist, is_owner_or_supplier, is_receptionist, is_supplier, \
     create_warning_message, order_product_by_name
 from .tokens import account_activation_token
-from .models import ProductDelivery, Product, Service, Appointment
-from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, AppointmentClientForm, AppointmentForm
+from .models import ProductDelivery, Product, Client, Order,  Service, Appointment
+from .forms import NewEmployeeForm, LoginForm, ProductDeliveryForm, ClientForm, ClientForm2, AppointmentClientForm, AppointmentForm
+
 
 User = get_user_model()
 
@@ -146,6 +151,7 @@ def login_user(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
             login(request, user)
             if is_owner(user):
@@ -159,8 +165,8 @@ def login_user(request):
             return render(request, 'index.html')
 
     form = LoginForm()
-
-    context = {"form": form}
+    clients = Client.objects.all()
+    context = {"form": form , 'clients': clients}
     return render(request, "templates/login.html", context)
 
 
@@ -184,7 +190,8 @@ def product_list(request):
 
 def products_store_page(request):
     grouped_products = order_product_by_name(False)
-    context = {'grouped_products': grouped_products.values()}
+    clients = Client.objects.all()
+    context = {'grouped_products': grouped_products.values(), 'clients': clients}
     return render(request, 'products_store_page.html', context)
 
 
@@ -193,6 +200,35 @@ def delete_product(request, product_name, delivery_id):
     product_delivery.amount -= 1
     product_delivery.save()
     return redirect('products_store_page')
+
+def refund_product(request, product_name, client_id, order_id):
+    product_delivery = ProductDelivery.objects.get(name=product_name)
+    chosen_product = Product.objects.get(name=product_name)
+    client = Client.objects.get(pk=client_id)
+    client_orders = Order.objects.filter(client=client)
+    single_order = client_orders.get(id=order_id)
+    client.benefits_program -=  chosen_product.price
+    product_delivery.amount += 1
+    product_delivery.save()
+    single_order.refunded = True
+    single_order.save()
+    return redirect('client_page', client_id=client.pk)
+
+def sell_product(request, product_name, delivery_id):
+    product_delivery = ProductDelivery.objects.get(name=product_name, delivery_id=delivery_id)
+    chosen_product = Product.objects.get(name=product_name)
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        if client_id:
+            client = Client.objects.get(pk=client_id)
+            order = Order.objects.create(product=chosen_product, client=client, date=datetime.date.today())
+            product_delivery.amount -= 1
+            product_delivery.save()
+            return redirect('client_page', client_id=client.pk)
+    else:
+        return redirect('products_store_page')   
+    
+
 
 
 def change_deficit_status(request, product_name):
@@ -226,6 +262,41 @@ def appointment(request, primary_key):
         return redirect("schedule")
     return render(request, 'appointment.html', {'appointment': appointment_object})
 
+
+def client_register(request):
+    if request.method == 'POST':
+        form = ClientForm2(request.POST)
+        if form.is_valid():
+            client = form.save()
+            return redirect(reverse('client_page', args=[client.id]))
+    else:
+        form = ClientForm2()
+    return render(request, 'client_register.html', {'form': form})
+
+
+def client_list(request):
+    clients = Client.objects.all()
+    return render(request, 'client_list.html', {'clients': clients})
+
+
+def client_page(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    orders = Order.objects.filter(client=client)
+    grouped_products = order_product_by_name(False)
+    context = {'grouped_products': grouped_products.values(), 'client': client, 'orders' : orders}
+    return render(request, 'client_page.html', context)
+
+def loyal_page(request, client_id):
+    client = get_object_or_404(Client, id=client_id)
+    grouped_products = order_product_by_name(False)
+    context = {'grouped_products': grouped_products.values(), 'client': client,}
+    return render(request, 'loyal_page.html', context)
+
+def go_to_client(request):
+    if request.method == 'POST':
+        client_id = request.POST.get('client')
+        if client_id:
+            return redirect(reverse('client_page', args=[client_id]))
 
 @login_required(login_url="login_user")
 @user_passes_test(is_owner_or_receptionist, login_url="index")

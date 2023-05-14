@@ -2,6 +2,20 @@
 {% load static %}
 {% load django_bootstrap5 %}
 
+{% block head %}
+  <script>
+    const sellToRegisteredBtn = document.getElementById('sell-to-registered-btn');
+    const sellToRegisteredSelect = document.getElementById('sell-to-registered-select');
+    const sellSubmitBtn = document.querySelector('#sell-form [type="submit"]');
+
+    sellToRegisteredBtn.addEventListener('click', function() {
+      sellToRegisteredBtn.style.display = 'none';
+      sellToRegisteredSelect.style.display = 'block';
+      sellSubmitBtn.style.display = 'block';
+    });
+  </script>
+{% endblock %}
+
 {% block content %}
   <div class="container">
     <h1><strong>Products Store List</strong></h1>
@@ -12,12 +26,27 @@
             <img class="card-img-top" src="{{ product.image.url }}">
             <div class="card-body">
               <h4 class="card-title" font-weight-bold><strong>{{ product.name }}</strong></h4>
-                <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
-                <h3>Price: {{ product.price }} PLN</h3>
-                <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
-                    {% csrf_token %}
-                    <input type="submit" value="Sold one product">
-                </form>
+              <h3 class="text-muted">Amount: {{ product.total_amount }}</h3>
+              <h3>Price: {{ product.price }} PLN</h3>
+
+              <form action="{% url 'sell_product' product.name product.delivery_id %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="sell-to-registered" class="form-label">Sell to Registered:</label>
+                  <select class="form-select" id="sell-to-registered" name="client">
+                    <option value="" selected disabled>Choose a client</option>
+                    {% for client in clients %}
+                      <option value="{{ client.id }}">{{ client.name }} {{ client.surname }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <input type="submit" value="Sell" class="btn btn-primary">
+              </form>
+
+              <form action="{% url 'delete_product' product.name product.delivery_id %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Sale to no-Member" class="btn btn-danger">
+              </form>
             </div>
           </div>
         </div>

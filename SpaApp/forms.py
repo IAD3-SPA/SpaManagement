@@ -4,6 +4,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.forms import DateInput
+from .models import Client
+
 from betterforms.multiform import MultiModelForm
 
 from .utils import forms_attrs, get_next_hour
@@ -66,6 +68,36 @@ class ProductDeliveryForm(forms.ModelForm):
             })
         }
 
+class ClientForm2(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ['name', 'surname', 'phone_number']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Imie'}),
+            'surname': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Nazwisko'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control my-3', 'placeholder': 'Numer telefonu'}),
+        }
+
+    def save(self, commit=True):
+        client = super().save(commit=False)
+        if commit:
+            client.save()
+        return client
+ 
+
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ["name", "surname", "phone_number"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs.update(forms_attrs("Imie"))
+        self.fields["surname"].widget.attrs.update(forms_attrs("Nazwisko"))
+        self.fields["phone_number"].widget.attrs.update(forms_attrs("+48..."))
+
+
+
 
 def _get_employee_list() -> list[tuple[int, str]]:
     """return list of emplyee"""
@@ -102,18 +134,6 @@ class AppointmentForm(forms.ModelForm):
             if date < date.today() or time < datetime.now().time():
                 raise forms.ValidationError("Podana data jest przeszła.")
         return cleaned_data
-
-
-class ClientForm(forms.ModelForm):
-    class Meta:
-        model = Client
-        fields = ["name", "surname", "phone_number"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["name"].widget.attrs.update(forms_attrs("Imie"))
-        self.fields["surname"].widget.attrs.update(forms_attrs("Nazwisko"))
-        self.fields["phone_number"].widget.attrs.update(forms_attrs("+48..."))
 
 
 class AppointmentClientForm(MultiModelForm):

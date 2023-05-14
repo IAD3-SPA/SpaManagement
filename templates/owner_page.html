@@ -4,53 +4,67 @@
 {% block content %}
 
 <h1 class="center" style="text-align: center; margin:25px">
-    Witaj Właścicielu. 
+  Witaj Właścicielu.
 </h1>
-    {%  if message %}
-    <script>
-    window.onload = function()
-    {
-        alert("{{ message|escapejs }}")
-    }
-    </script>
-    {% endif %}
+{% if message %}
+<script>
+  window.onload = function () {
+    alert("{{ message|escapejs }}")
+  }
+</script>
+{% endif %}
 <div class="container text-center">
-    <div class="row row-cols-2" >
-      <div class="col">
-        <div class="card" style="margin:25px">
-            <div class="card-body">
-              <h5 class="card-title">Ekran dostaw</h5>
-              <p class="card-text">Zobacz szczegóły dotyczące dostaw.</p>
-              <a href="{% url 'delivery_page' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
-            </div>
-          </div>
+  <div class="row row-cols-2">
+    <div class="col">
+      <div class="card" style="margin:25px">
+        <div class="card-body">
+          <h5 class="card-title">Ekran dostaw</h5>
+          <p class="card-text">Zobacz szczegóły dotyczące dostaw.</p>
+          <a href="{% url 'delivery_page' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
+        </div>
       </div>
-      <div class="col">
-        <div class="card" style="margin:25px">
-            <div class="card-body">
-              <h5 class="card-title">Harmonogram</h5>
-              <p class="card-text">Zobacz jak przedstawiają się terminy.</p>
-              <a href="{% url 'schedule' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a> 
-            </div>
-          </div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin:25px">
+        <div class="card-body">
+          <h5 class="card-title">Harmonogram</h5>
+          <p class="card-text">Zobacz jak przedstawiają się terminy.</p>
+          <a href="{% url 'schedule' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
+        </div>
       </div>
-      <div class="col">
-        <div class="card" style="margin:25px">
-            <div class="card-body">
-              <h5 class="card-title">Stan magazynu</h5>
-              <p class="card-text">Zobacz ile produktów jest na stanie.</p>
-              <a href="{% url 'product_list' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a> 
-            </div>
-          </div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin:25px">
+        <div class="card-body">
+          <h5 class="card-title">Stan magazynu</h5>
+          <p class="card-text">Zobacz ile produktów jest na stanie.</p>
+          <a href="{% url 'product_list' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
+        </div>
       </div>
-      <div class="col">
-        <div class="card" style="margin:25px">
-            <div class="card-body">
-              <h5 class="card-title">Nowy pracownik</h5>
-              <p class="card-text">Dodaj nowego pracownika. Możesz to zrobić również klikając przycisk w prawym górnym rogu ekranu.</p>
-              <a href="{% url 'register' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
-            </div>
-          </div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin:25px">
+        <div class="card-body">
+          <h5 class="card-title">Nowy pracownik</h5>
+          <p class="card-text">Dodaj nowego pracownika. Możesz to zrobić również klikając przycisk w prawym górnym rogu
+            ekranu.</p>
+          <a href="{% url 'register' %}" class="btn" style="background-color: #FFB6C1;">Przejdź</a>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin:25px">
+        <div class="card-body">
+          <h5 class="card-title">Klient!</h5>
+          <p class="card-text">Obsłuż zarejestrowanych Klientów lub Dodaj nowych!</p>
+          <a href="{% url 'client_register' %}" class="btn" style="background-color: #FFB6C1;">Dodaj</a>
+          <select class="form-select" id="sell-to-registered" name="client">
+            <option value="" selected disabled>Choose a client</option>
+            {% for client in clients %}
+              <option value="{{ client.id }}">{{ client.name }} {{ client.surname }}</option>
+            {% endfor %}
+          </select>
+        </div>
       </div>
       <div class="col">
         <div class="card" style="margin:25px">
@@ -63,5 +77,6 @@
       </div>
     </div>
   </div>
+</div>
 
 {% endblock content %}

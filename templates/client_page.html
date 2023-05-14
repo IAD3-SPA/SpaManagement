@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% block content %}
+
+{% block head %}
+  <script>
+    const sellToRegisteredBtn = document.getElementById('sell-to-registered-btn');
+    const sellToRegisteredSelect = document.getElementById('sell-to-registered-select');
+    const sellSubmitBtn = document.querySelector('#sell-form [type="submit"]');
+
+    sellToRegisteredBtn.addEventListener('click', function() {
+      sellToRegisteredBtn.style.display = 'none';
+      sellToRegisteredSelect.style.display = 'block';
+      sellSubmitBtn.style.display = 'block';
+    });
+  </script>
+{% endblock %}
+
+<style>
+table { 
+	width: 750px; 
+	border-collapse: collapse; 
+	margin:50px auto;
+	}
+
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+	background: #eee; 
+	}
+
+th { 
+	background: #3498db; 
+	color: white; 
+	font-weight: bold; 
+	}
+
+td, th { 
+	padding: 10px; 
+	border: 1px solid #ccc; 
+	text-align: left; 
+	font-size: 18px;
+	}
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	table { 
+	  	width: 100%; 
+	}
+
+	/* Force table to not be like tables anymore */
+	table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	tr { border: 1px solid #ccc; }
+	
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		/* Label the data */
+		content: attr(data-column);
+
+		color: #000;
+		font-weight: bold;
+	}
+
+}
+</style>
+
+<h1><strong>To jest strona klienta :</strong></h1>
+<h1>{{ client.name }} {{ client.surname }}</h1>
+<p>Numer ID klienta : <strong>{{ client.id }}</strong></p>
+<p>Ilość punktów w programie lojalnościowym : <strong>{{ client.benefits_program }}</strong> </p>
+<p>Numer telefonu klienta : <strong>{{ client.phone_number }}</strong></p>
+
+<h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}}</h1>
+
+<button type="button" onclick="window.location.href='/login/{{ client.id }}/loyal/';" class="btn btn-primary">Przejdź do strony programu lojalnościowego</button>
+<button type="button" onclick="window.location.href='/login/';" class="btn btn-primary">Powrót do strony logowania</button>
+
+
+<table>
+    <thead>
+      <tr>
+        <th>Produkt</th>
+        <th>Ilość</th>
+        <th>Status Zwrotu</th>
+        <th>Zwróć</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td data-column="Produkt">{{ order.product}}</td>
+            <td data-column="Ilość">{{ order.amount}}</td>
+            <td data-column="Status Zwrotu">{{order.refunded}}</td>
+            <td data-column="Zwróć">
+              {% if order.refunded %}
+                <button disabled style="background-color: gray;">Zwrócono</button>
+              {% else %}
+                <a href="{% url 'refund_product' order.product order.client.id  order.id %}" class="btn btn-dark">Zwróć</a>
+                path('refund_product/<str:product_name>/<int:delivery_id>/<int:client_id>/<int:orders>', views.refund_product, name='refund_product'),
+              {% endif %}
+              </td>
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+
+
+
+
+
+
+{% endblock content %}
+
+<div id="app"></div>
+
+<footer>
+	<p>
+		Created with <i class="fa fa-heart"></i> by
+		<a target="_blank" href="https://florin-pop.com">Florin Pop</a>
+		- Read about how I created this on my
+		<a target="_blank" href="https://www.florin-pop.com/blog/2019/04/how-to-create-a-timeline-with-react/">blog</a>
+	</p>
+</footer>
+-->

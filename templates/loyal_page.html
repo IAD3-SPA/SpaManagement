@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap5 %}
+{% block content %}
+
+{% block head %}
+  <script>
+    const sellToRegisteredBtn = document.getElementById('sell-to-registered-btn');
+    const sellToRegisteredSelect = document.getElementById('sell-to-registered-select');
+    const sellSubmitBtn = document.querySelector('#sell-form [type="submit"]');
+
+    sellToRegisteredBtn.addEventListener('click', function() {
+      sellToRegisteredBtn.style.display = 'none';
+      sellToRegisteredSelect.style.display = 'block';
+      sellSubmitBtn.style.display = 'block';
+    });
+  </script>
+{% endblock %}
+
+
+
+<h1>Witaj <strong>{{ client.name }} {{ client.surname }} !</strong></h1>
+<p>Jesteś jednym z naszych najlepszych klientów!</p>
+<p>Twoja liczba punktów w programie to : <strong>{{ client.benefits_program }} </strong></p>
+<p>Tutaj na dole są twoje atrakcyjne nagrody , zerknij , a sie nie rozczarujesz!</p>
+<p> Alternatywnie możesz też poniższym przyciskiem  cofnąć się na stronę twojego profilu ale nie polecam </p>
+<a href="#" onclick="window.history.back();" aria-label="Cofnij" class="btn btn-dark">Cofnij</a>
+
+
+<h1>{{ order.product }} {{ order.amount }} {{order.date}} {{order.refunded}} </h1>
+
+
+<style>
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Helvetica, sans-serif;
+}
+body {
+  background: #25303B;
+}
+section#timeline {
+  width: 80%;
+  margin: 20px auto;
+  position: relative;
+}
+section#timeline:before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin: 0 0 0 -1px;
+  width: 2px;
+  height: 100%;
+  background: rgba(255,255,255,0.2);
+}
+section#timeline article {
+  width: 100%;
+  margin: 0 0 20px 0;
+  position: relative;
+}
+section#timeline article:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+section#timeline article div.inner {
+  width: 40%;
+  float: left;
+  margin: 5px 0 0 0;
+  border-radius: 6px;
+}
+section#timeline article div.inner span.date {
+  display: block;
+  width: 60px;
+  height: 50px;
+  padding: 5px 0;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  margin: 0 0 0 -32px;
+  border-radius: 100%;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  background: #25303B;
+  color: rgba(255,255,255,0.5);
+  border: 2px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 0 7px #25303B;
+}
+section#timeline article div.inner span.date span {
+  display: block;
+  text-align: center;
+}
+section#timeline article div.inner span.date span.day {
+  font-size: 10px;
+}
+section#timeline article div.inner span.date span.month {
+  font-size: 18px;
+}
+section#timeline article div.inner span.date span.year {
+  font-size: 10px;
+}
+section#timeline article div.inner h2 {
+  padding: 15px;
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+}
+section#timeline article div.inner h2:after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: -5px;
+  	width: 10px; 
+	  height: 10px;
+  -webkit-transform: rotate(-45deg);
+}
+section#timeline article div.inner p {
+  padding: 15px;
+  margin: 0;
+  font-size: 14px;
+  background: #fff;
+  color: #656565;
+  border-radius: 0 0 6px 6px;
+}
+section#timeline article:nth-child(2n+2) div.inner {
+  float: right;
+}
+section#timeline article:nth-child(2n+2) div.inner h2:after {
+  left: -5px;
+}
+section#timeline article:nth-child(1) div.inner h2 {
+  background: #e74c3c;
+}
+section#timeline article:nth-child(1) div.inner h2:after {
+  background: #e74c3c;
+}
+section#timeline article:nth-child(2) div.inner h2 {
+  background: #2ecc71;
+}
+section#timeline article:nth-child(2) div.inner h2:after {
+  background: #2ecc71;
+}
+section#timeline article:nth-child(3) div.inner h2 {
+  background: #e67e22;
+}
+section#timeline article:nth-child(3) div.inner h2:after {
+  background: #e67e22;
+}
+section#timeline article:nth-child(4) div.inner h2 {
+  background: #1abc9c;
+}
+section#timeline article:nth-child(4) div.inner h2:after {
+  background: #1abc9c;
+}
+section#timeline article:nth-child(5) div.inner h2 {
+  background: #9b59b6;
+}
+section#timeline article:nth-child(5) div.inner h2:after {
+  background: #9b59b6;
+}
+
+</style>
+
+
+
+<section id="timeline">
+    {% for product in grouped_products %}
+        {% if forloop.counter == 1%}
+        <article>
+        <div class="inner">
+        <a><strong><span style="font-size: 50px; color: black;">20 PUNKTÓW</span></strong></a>
+
+            <h2><strong> Piana z której wynurzyła się Afrodyta!</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">
+            {% if client.benefits_program < 20 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger">
+            {% endif %}  
+        </div>
+        </article>
+        {% endif %}
+
+        {% if forloop.counter == 2%}
+        <article>
+        <div class="inner">
+            <a><strong><span style="font-size: 50px; color: black;">40 PUNKTÓW</span></strong></a>
+            <h2><strong>Błoto z Bagna Shreka</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">
+            {% if client.benefits_program < 40 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
+        </div>
+        </article>
+        {% endif %}
+
+        {% if forloop.counter == 3%}
+        <article>
+        <div class="inner">
+            <a><strong><span style="font-size: 50px; color: black;">60 PUNKTÓW</span></strong></a>
+            <h2><strong>Elegancki Śluz z nosa Shreka</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">
+            {% if client.benefits_program >= 60 %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger">
+            {% else %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% endif %}   
+        </div>
+        </article>
+        {% endif %}
+
+        {% if forloop.counter == 4%}
+        <article>
+        <div class="inner">
+            <a><strong><span style="font-size: 50px; color: black;">80 PUNKTÓW</span></strong></a>
+            <h2><strong>Lawendowe Perfumy Księcia z Bajki</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">  
+            {% if client.benefits_program < 80 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
+        </div>
+        </article>
+        {% endif %}
+
+        {% if forloop.counter == 5%}
+        <article>
+        <div class="inner">
+            <a><strong><span style="font-size: 50px; color: black;">9999 PUNKTÓW</span></strong></a>
+            <h2><strong>Święty olej Ręczny z antiochii</strong></h2>
+            <img class="card-img-top" src="{{ product.image.url }}">  
+            {% if client.benefits_program < 9999 %}
+            <input type="submit" value="Masz dopiero {{ client.benefits_program }} punktów postaraj się bardziej!" class="btn btn-danger" >
+            {% else %}
+            <input type="submit" value="CLAIMED!" class="btn btn-danger" >
+            {% endif %}
+        </div>
+        </article>
+        {% endif %}
+    {% endfor %}
+  </section>
+
+
+            
+</div>
+
+
+{% endblock content %}
+
+<div id="app"></div>
+
+<footer>
+	<p>
+		Created with <i class="fa fa-heart"></i> by
+		<a target="_blank" href="https://florin-pop.com">Florin Pop</a>
+		- Read about how I created this on my
+		<a target="_blank" href="https://www.florin-pop.com/blog/2019/04/how-to-create-a-timeline-with-react/">blog</a>
+	</p>
+</footer>

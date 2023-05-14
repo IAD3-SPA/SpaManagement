@@ -216,13 +216,23 @@ class Cosmethologist(User):
         return super().save(*args, **kwargs)
 
 
-class Client(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
-    surname = models.CharField(max_length=255, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+class Client(models.Model): 
+    name = models.CharField(max_length=255) 
+    surname = models.CharField(max_length=255) 
+    phone_number = models.CharField(max_length=15)
+    benefits_program = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.name + " " + self.surname
+
+    def increase_benefits_program(self, order_value):
+        self.benefits_program += order_value
+        self.save()
+
+    def reduce_benefits_program(self, product_value):
+        self.benefits_program -= product_value
+        self.save()
+
 
 
 class Appointment(models.Model):
@@ -261,3 +271,26 @@ class Service(models.Model):
 
     def __str__(self):
         return self.service_name
+
+class Order(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    amount = models.IntegerField(default=1)
+    date = models.DateField()
+    refunded = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.product.name} x {self.amount} for {self.client.name} on {self.date}"
+
+
+    
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        order_value = self.product.price * self.amount
+        self.client.increase_benefits_program(order_value)
+
+    def delete(self, *args, **kwargs):
+        order_value = self.product.price * self.amount
+        self.client.reduce_benefits_program(order_value)
+        super().delete(*args, **kwargs)
