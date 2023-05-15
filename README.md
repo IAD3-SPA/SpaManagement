@@ -149,6 +149,38 @@ After both lines are commented make migrations:
 python manage.py migrate 
 ```
 And then uncomment those lines.
+### Missing Spa User
+In case of this error:
+```
+psycopg2.errors.UndefinedTable: relation "SpaApp_user" does not exist
+spamanagement-web-1 | LINE 1: ...pp_user"."date_joined", "SpaApp_user"."type" FROM "SpaApp_us...
+```
+you need to open `forms.py` and comment these lines:
+```python
+
+
+
+
+# def _get_employee_list() -> list[tuple[int, str]]:
+#     """return list of emplyee"""
+#     users = user_model.objects.all()
+#     return [(user.id, user.username) for user in users]
+# 
+
+class AppointmentForm(forms.ModelForm):
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
+    description = forms.CharField(widget=forms.Textarea, required=False)
+
+    # employee = forms.ChoiceField(choices=_get_employee_list(),
+    #                           widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Appointment
+        fields = ["name", "description", "date", "time"]
+```
+With those lines commented now you should be able to migrate. <br>
+After migration uncomment those lines back. <br>
 ## Contributors
 
 - Anna Kaniowska
